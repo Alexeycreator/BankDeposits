@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using BankDepositsApplication.ActionsData;
 using BankDepositsApplication.Models;
 
 namespace BankDepositsApplication
@@ -175,6 +176,8 @@ namespace BankDepositsApplication
             try
             {
                 CheckCorrFilling();
+                CentralBankParser test = new CentralBankParser();
+                test.CB_Parser();
             }
             catch (Exception ex)
             {
