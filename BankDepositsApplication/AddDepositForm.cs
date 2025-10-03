@@ -14,12 +14,15 @@ namespace BankDepositsApplication
         private List<CurrencyModel> currencys;
         private List<BankDepModel> bankDeposits;
         private string[] banks = { "Т-Банк", "ПСБ", "Сбербанк" };
+        private MainForm mainForm;
 
-        public AddDepositForm(List<CurrencyModel> _currencys, List<BankDepModel> _bankDeposits)
+        public AddDepositForm(MainForm _mainForm, List<CurrencyModel> _currencys, List<BankDepModel> _bankDeposits)
         {
+            mainForm = _mainForm;
             currencys = _currencys;
             bankDeposits = _bankDeposits;
             InitializeComponent();
+            mainForm.CurrencyDataReady += OnCurrencyDataReady;
         }
 
         private void AddDepositForm_Load(object sender, EventArgs e)
@@ -30,6 +33,17 @@ namespace BankDepositsApplication
         }
 
         #region Settings
+
+        private void OnCurrencyDataReady(List<CurrencyModel> data)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<List<CurrencyModel>>(OnCurrencyDataReady), data);
+                return;
+            }
+
+            AddedCmbxCurrency(data);
+        }
 
         private void SettingsElementsForm()
         {
@@ -86,6 +100,7 @@ namespace BankDepositsApplication
 
         private void AddedCmbxCurrency(List<CurrencyModel> currencys)
         {
+            cmbxCurrency.Items.Clear();
             foreach (var currency in currencys)
             {
                 cmbxCurrency.Items.Add(currency.Currency);

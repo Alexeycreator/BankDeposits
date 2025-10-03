@@ -135,7 +135,7 @@ namespace BankDepositsApplication.ActionsData
             return currencys;
         }
 
-        internal void CB_Parser()
+        internal List<CurrencyModel> CB_Parser()
         {
             try
             {
@@ -150,6 +150,8 @@ namespace BankDepositsApplication.ActionsData
                 loggerCentralBankParser.Error($"{ex.Message}");
                 MessageBox.Show($"{ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
+            return currencys;
         }
     }
 }

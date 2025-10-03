@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BankDepositsApplication.ActionsData;
@@ -20,6 +21,7 @@ namespace BankDepositsApplication
         private Logger loggerMainForm = LogManager.GetCurrentClassLogger();
         private List<CurrencyModel> currencys = new List<CurrencyModel>();
         private List<BankDepModel> bankDeposits = new List<BankDepModel>();
+        public event Action<List<CurrencyModel>> CurrencyDataReady;
 
         public MainForm()
         {
@@ -56,6 +58,7 @@ namespace BankDepositsApplication
                     dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
                         cellDateClose);
                 }
+
                 SortRowsData();
             }
             catch (Exception ex)
@@ -79,14 +82,20 @@ namespace BankDepositsApplication
         private void MainForm_Load(object sender, EventArgs e)
         {
             ColomnsDataGridAdded();
-            CentralBankParser cbParser = new CentralBankParser(currencys);
-            cbParser.CB_Parser();
+            Thread test = new Thread(() =>
+            {
+                CentralBankParser cbParser = new CentralBankParser(currencys);
+                var result = cbParser.CB_Parser();
+
+                CurrencyDataReady?.Invoke(result);
+            });
+            test.Start();
         }
 
         private void btnAddDeposit_Click(object sender, EventArgs e)
         {
             bankDeposits = new List<BankDepModel>();
-            AddDepositForm addDepositForm = new AddDepositForm(currencys, bankDeposits);
+            AddDepositForm addDepositForm = new AddDepositForm(this, currencys, bankDeposits);
             addDepositForm.ShowDialog();
             CalculationData calcData = new CalculationData(bankDeposits);
             calcData.GetCalcDeposits();

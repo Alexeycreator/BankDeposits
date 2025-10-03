@@ -12,14 +12,37 @@ namespace BankDepositsApplication.WorkFiles
     {
         private Logger loggerDefaultDataCB = LogManager.GetCurrentClassLogger();
 
-        private string csvFilePath =
-            $@"C:\Users\Алексей\Desktop\Учеба\github\WebSocketApplication\ServerConsoleApplication\bin\Debug\CentralBank\02.10.2025\Rate_10-21.csv";
+        private readonly string csvFilePath;
 
         private List<CurrencyModel> currencys;
 
         public DefaultDataCB(List<CurrencyModel> _currencys)
         {
             currencys = _currencys;
+            string dirPath = Path.Combine(Directory.GetCurrentDirectory());
+            csvFilePath = FindRateFile(dirPath);
+        }
+
+        private string FindRateFile(string dirPath)
+        {
+            if (!Directory.Exists(dirPath))
+            {
+                throw new DirectoryNotFoundException($"Директории не существует или не найдена. {dirPath}");
+            }
+
+            string serchFile = "Курсы*.csv";
+            var rateFile = Directory.GetFiles(dirPath, serchFile);
+            if (rateFile.Length == 0)
+            {
+                throw new FileNotFoundException($"Файл {serchFile} не найде в директории {dirPath}");
+            }
+
+            if (rateFile.Length > 1)
+            {
+                return rateFile.OrderByDescending(f => f).First();
+            }
+
+            return rateFile[0];
         }
 
         private protected List<CurrencyModel> DefaultRate()
