@@ -48,22 +48,31 @@ namespace BankDepositsApplication.WorkFiles
         private protected List<CurrencyModel> DefaultRate()
         {
             loggerDefaultDataCB.Info("Получение старых данных от ЦБ за 02.10.2025");
-            using (StreamReader sr = new StreamReader(csvFilePath))
+            try
             {
-                sr.ReadLine();
-                while (!sr.EndOfStream)
+                using (StreamReader sr = new StreamReader(csvFilePath))
                 {
-                    string line = sr.ReadLine();
-                    var data = line.Split(';');
-                    currencys.Add(new CurrencyModel
+                    sr.ReadLine();
+                    while (!sr.EndOfStream)
                     {
-                        DigitalCode = Convert.ToInt32(data[0]),
-                        LetterCode = data[1],
-                        Units = Convert.ToInt32(data[2]),
-                        Currency = data[3],
-                        Rate = Math.Round(Convert.ToDouble(data[4]), 4)
-                    });
+                        string line = sr.ReadLine();
+                        var data = line.Split(';');
+                        currencys.Add(new CurrencyModel
+                        {
+                            DigitalCode = Convert.ToInt32(data[0]),
+                            LetterCode = data[1],
+                            Units = Convert.ToInt32(data[2]),
+                            Currency = data[3],
+                            Rate = Math.Round(Convert.ToDouble(data[4]), 4)
+                        });
+                    }
                 }
+
+                loggerDefaultDataCB.Info("Данные успешно получены.");
+            }
+            catch (Exception ex)
+            {
+                loggerDefaultDataCB.Error($"{ex.Message}");
             }
 
             return currencys;

@@ -23,6 +23,9 @@ namespace BankDepositsApplication
         private List<BankDepModel> bankDeposits = new List<BankDepModel>();
         public event Action<List<CurrencyModel>> CurrencyDataReady;
 
+        private int retryCount = 0;
+        private const int maxRetryes = 3;
+
         public MainForm()
         {
             InitializeComponent();
@@ -77,29 +80,71 @@ namespace BankDepositsApplication
             return value.ToString("N0", CultureInfo.InvariantCulture);
         }
 
-        #endregion
-
-        private void MainForm_Load(object sender, EventArgs e)
+        private void StartParserThread()
         {
-            ColomnsDataGridAdded();
             Thread test = new Thread(() =>
             {
-                CentralBankParser cbParser = new CentralBankParser(currencys);
-                var result = cbParser.CB_Parser();
-
-                CurrencyDataReady?.Invoke(result);
+                try
+                {
+                    CentralBankParser cbParser = new CentralBankParser(currencys);
+                    var result = cbParser.CB_Parser();
+                    CurrencyDataReady?.Invoke(result);
+                    retryCount = 0;
+                }
+                catch (Exception ex)
+                {
+                    loggerMainForm.Error($"{ex.Message}");
+                }
             });
             test.Start();
         }
 
+        #endregion
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                ColomnsDataGridAdded();
+                StartParserThread();
+            }
+            catch (ThreadStartException tse)
+            {
+                loggerMainForm.Error($"{tse.Message}");
+
+                if (retryCount < maxRetryes)
+                {
+                    retryCount++;
+                    loggerMainForm.Info($"Повторная попытка {retryCount} из {maxRetryes}");
+                    Thread.Sleep(1000);
+                    StartParserThread();
+                }
+                else
+                {
+                    loggerMainForm.Error("Превышено максимальное количество попыток");
+                }
+            }
+            catch (Exception ex)
+            {
+                loggerMainForm.Error($"{ex.Message}");
+            }
+        }
+
         private void btnAddDeposit_Click(object sender, EventArgs e)
         {
-            bankDeposits = new List<BankDepModel>();
-            AddDepositForm addDepositForm = new AddDepositForm(this, currencys, bankDeposits);
-            addDepositForm.ShowDialog();
-            CalculationData calcData = new CalculationData(bankDeposits);
-            calcData.GetCalcDeposits();
-            RowsDataGridAdded();
+            try
+            {
+                bankDeposits = new List<BankDepModel>();
+                AddDepositForm addDepositForm = new AddDepositForm(this, currencys, bankDeposits);
+                addDepositForm.ShowDialog();
+                CalculationData calcData = new CalculationData(bankDeposits);
+                calcData.GetCalcDeposits();
+                RowsDataGridAdded();
+            }
+            catch (Exception ex)
+            {
+                loggerMainForm.Error($"{ex.Message}");
+            }
         }
     }
 }
