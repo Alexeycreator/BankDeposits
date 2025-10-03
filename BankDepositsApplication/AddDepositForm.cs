@@ -4,21 +4,29 @@ using System.Drawing;
 using System.Windows.Forms;
 using BankDepositsApplication.ActionsData;
 using BankDepositsApplication.Models;
+using NLog;
 
 namespace BankDepositsApplication
 {
     public partial class AddDepositForm : Form
     {
-        private List<BankDepModel> bankDeposits = new List<BankDepModel>();
+        private Logger loggerAddDepositForm = LogManager.GetCurrentClassLogger();
+        private List<CurrencyModel> currencys;
+        private List<BankDepModel> bankDeposits;
+        private string[] banks = { "Т-Банк", "ПСБ", "Сбербанк" };
 
-        public AddDepositForm()
+        public AddDepositForm(List<CurrencyModel> _currencys, List<BankDepModel> _bankDeposits)
         {
+            currencys = _currencys;
+            bankDeposits = _bankDeposits;
             InitializeComponent();
         }
 
         private void AddDepositForm_Load(object sender, EventArgs e)
         {
             SettingsElementsForm();
+            AddedCmbxBank(banks);
+            AddedCmbxCurrency(currencys);
         }
 
         #region Settings
@@ -46,9 +54,20 @@ namespace BankDepositsApplication
             tbxDeposit.ForeColor = Color.Gray;
 
             tbxCurrency.Text = "руб";
+            tbxCurrency.Enabled = false;
 
             cmbxCurrency.Text = "Выберите валюту";
             cmbxCurrency.ForeColor = Color.Gray;
+
+            rBtnMonth.Enabled = true;
+            rBtnMonth.Checked = true;
+            rBtnDays.Enabled = false;
+
+            tbxTerm.Text = "срок";
+            tbxTerm.ForeColor = Color.Gray;
+
+            tbxBid.Text = "%";
+            tbxBid.ForeColor = Color.Gray;
         }
 
         #endregion
@@ -60,21 +79,114 @@ namespace BankDepositsApplication
             return Int32.TryParse(text, out int value);
         }
 
-        private bool IsParseDecimal(string text)
+        private bool IsParseDouble(string text)
         {
-            return Decimal.TryParse(text, out decimal value);
+            return Double.TryParse(text, out double value);
         }
 
-        private void CheckCorrFilling()
+        private void AddedCmbxCurrency(List<CurrencyModel> currencys)
         {
-            if (cmbxBank.SelectedItem == null)
+            foreach (var currency in currencys)
             {
-                labelMandatoryBank.Visible = true;
+                cmbxCurrency.Items.Add(currency.Currency);
             }
-            else
+        }
+
+        private void AddedCmbxBank(string[] banks)
+        {
+            foreach (var bank in banks)
             {
-                labelMandatoryBank.Visible = false;
+                cmbxBank.Items.Add(bank);
             }
+        }
+
+        public List<BankDepModel> AddBankDeposit()
+        {
+            try
+            {
+                if (chbxCapitalization.Checked)
+                {
+                    if (tbxCurrency.Text == "руб")
+                    {
+                        bankDeposits.Add(new BankDepModel
+                        {
+                            Name = cmbxBank.SelectedItem.ToString(),
+                            Deposit = Convert.ToDouble(tbxDeposit.Text),
+                            Currency = tbxCurrency.Text,
+                            Rate = 1,
+                            Term = Convert.ToInt32(tbxTerm.Text),
+                            Bid = Convert.ToDouble(tbxBid.Text),
+                            DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
+                            Capitalization = true
+                        });
+                    }
+                    else
+                    {
+                        foreach (var currency in currencys)
+                        {
+                            if (cmbxCurrency.SelectedItem.ToString() == currency.Currency)
+                            {
+                                bankDeposits.Add(new BankDepModel
+                                {
+                                    Name = cmbxBank.SelectedItem.ToString(),
+                                    Deposit = Convert.ToDouble(tbxDeposit.Text),
+                                    Currency = tbxCurrency.Text,
+                                    Rate = currency.Rate,
+                                    Term = Convert.ToInt32(tbxTerm.Text),
+                                    Bid = Convert.ToDouble(tbxBid.Text),
+                                    DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
+                                    Capitalization = true
+                                });
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (tbxCurrency.Text == "руб")
+                    {
+                        bankDeposits.Add(new BankDepModel
+                        {
+                            Name = cmbxBank.SelectedItem.ToString(),
+                            Deposit = Convert.ToDouble(tbxDeposit.Text),
+                            Currency = tbxCurrency.Text,
+                            Rate = 1,
+                            Term = Convert.ToInt32(tbxTerm.Text),
+                            Bid = Convert.ToDouble(tbxBid.Text),
+                            DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
+                            Capitalization = false
+                        });
+                    }
+                    else
+                    {
+                        foreach (var currency in currencys)
+                        {
+                            if (cmbxCurrency.SelectedItem.ToString() == currency.Currency)
+                            {
+                                bankDeposits.Add(new BankDepModel
+                                {
+                                    Name = cmbxBank.SelectedItem.ToString(),
+                                    Deposit = Convert.ToDouble(tbxDeposit.Text),
+                                    Currency = tbxCurrency.Text,
+                                    Rate = currency.Rate,
+                                    Term = Convert.ToInt32(tbxTerm.Text),
+                                    Bid = Convert.ToDouble(tbxBid.Text),
+                                    DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
+                                    Capitalization = false
+                                });
+                            }
+                        }
+                    }
+                }
+
+                //Добавить enum для банков
+            }
+            catch (Exception ex)
+            {
+                loggerAddDepositForm.Error($"{ex.Message}");
+            }
+
+            return bankDeposits;
         }
 
         #endregion
@@ -89,7 +201,16 @@ namespace BankDepositsApplication
                 cmbxBank.ForeColor = Color.Gray;
             }
 
-            btnAddDeposit.Enabled = true;
+            if (cmbxBank.SelectedItem != null)
+            {
+                btnAddDeposit.Enabled = true;
+                labelMandatoryBank.Visible = false;
+            }
+            else
+            {
+                btnAddDeposit.Enabled = false;
+                labelMandatoryBank.Visible = true;
+            }
         }
 
         private void cmbxBank_Enter(object sender, EventArgs e)
@@ -110,7 +231,16 @@ namespace BankDepositsApplication
                 tbxDeposit.ForeColor = Color.Gray;
             }
 
-            btnAddDeposit.Enabled = true;
+            if (tbxDeposit.Text != null && IsParseInt(tbxDeposit.Text))
+            {
+                btnAddDeposit.Enabled = true;
+                labelMandatoryDeposit.Visible = false;
+            }
+            else
+            {
+                btnAddDeposit.Enabled = false;
+                labelMandatoryDeposit.Visible = true;
+            }
         }
 
         private void tbxDeposit_Enter(object sender, EventArgs e)
@@ -132,6 +262,7 @@ namespace BankDepositsApplication
             else
             {
                 cmbxCurrency.Visible = false;
+                labelMandatoryCurrency.Visible = false;
             }
         }
 
@@ -143,7 +274,25 @@ namespace BankDepositsApplication
                 cmbxCurrency.ForeColor = Color.Gray;
             }
 
-            btnAddDeposit.Enabled = true;
+            if (cmbxCurrency.SelectedItem != null)
+            {
+                foreach (var currency in currencys)
+                {
+                    if (cmbxCurrency.SelectedItem.ToString() == currency.Currency)
+                    {
+                        tbxCurrency.Text = currency.LetterCode;
+                    }
+                }
+
+                btnAddDeposit.Enabled = true;
+                labelMandatoryCurrency.Visible = false;
+            }
+            else
+            {
+                tbxCurrency.Text = "руб";
+                btnAddDeposit.Enabled = false;
+                labelMandatoryCurrency.Visible = true;
+            }
         }
 
         private void cmbxCurrency_Enter(object sender, EventArgs e)
@@ -154,6 +303,66 @@ namespace BankDepositsApplication
             }
 
             cmbxCurrency.ForeColor = Color.Black;
+        }
+
+        private void tbxTerm_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tbxTerm.Text))
+            {
+                tbxTerm.Text = "срок";
+                tbxTerm.ForeColor = Color.Gray;
+            }
+
+            if (tbxTerm != null && IsParseInt(tbxTerm.Text))
+            {
+                btnAddDeposit.Enabled = true;
+                labelMandatoryTerm.Visible = false;
+            }
+            else
+            {
+                btnAddDeposit.Enabled = false;
+                labelMandatoryTerm.Visible = true;
+            }
+        }
+
+        private void tbxTerm_Enter(object sender, EventArgs e)
+        {
+            if (!IsParseInt(tbxTerm.Text))
+            {
+                tbxTerm.Text = null;
+            }
+
+            tbxTerm.ForeColor = Color.Black;
+        }
+
+        private void tbxBid_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(tbxTerm.Text))
+            {
+                tbxBid.Text = "%";
+                tbxBid.ForeColor = Color.Gray;
+            }
+
+            if (tbxTerm != null && IsParseInt(tbxTerm.Text))
+            {
+                btnAddDeposit.Enabled = true;
+                labelMandatoryBid.Visible = false;
+            }
+            else
+            {
+                btnAddDeposit.Enabled = false;
+                labelMandatoryBid.Visible = true;
+            }
+        }
+
+        private void tbxBid_Enter(object sender, EventArgs e)
+        {
+            if (!IsParseDouble(tbxBid.Text))
+            {
+                tbxBid.Text = null;
+            }
+
+            tbxBid.ForeColor = Color.Black;
         }
 
         private void tbxBid_TextChanged(object sender, EventArgs e)
@@ -175,12 +384,12 @@ namespace BankDepositsApplication
         {
             try
             {
-                CheckCorrFilling();
-                CentralBankParser test = new CentralBankParser();
-                test.CB_Parser();
+                AddBankDeposit();
             }
             catch (Exception ex)
             {
+                loggerAddDepositForm.Error($"{ex.Message}");
+                MessageBox.Show($"{ex.Message}", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

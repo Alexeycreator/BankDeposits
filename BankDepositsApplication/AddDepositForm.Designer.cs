@@ -54,6 +54,7 @@ namespace BankDepositsApplication
             this.labelMandatoryCurrency = new System.Windows.Forms.Label();
             this.labelMandatoryTerm = new System.Windows.Forms.Label();
             this.labelMandatoryBid = new System.Windows.Forms.Label();
+            this.chbxCapitalization = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // labelTitle
@@ -88,7 +89,6 @@ namespace BankDepositsApplication
             // 
             this.cmbxBank.Font = new System.Drawing.Font("Times New Roman", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.cmbxBank.FormattingEnabled = true;
-            this.cmbxBank.Items.AddRange(new object[] { "a", "b" });
             this.cmbxBank.Location = new System.Drawing.Point(66, 56);
             this.cmbxBank.Name = "cmbxBank";
             this.cmbxBank.Size = new System.Drawing.Size(283, 27);
@@ -162,6 +162,8 @@ namespace BankDepositsApplication
             this.tbxTerm.Name = "tbxTerm";
             this.tbxTerm.Size = new System.Drawing.Size(85, 27);
             this.tbxTerm.TabIndex = 14;
+            this.tbxTerm.Enter += new System.EventHandler(this.tbxTerm_Enter);
+            this.tbxTerm.Leave += new System.EventHandler(this.tbxTerm_Leave);
             // 
             // rBtnDays
             // 
@@ -190,7 +192,9 @@ namespace BankDepositsApplication
             this.tbxBid.Name = "tbxBid";
             this.tbxBid.Size = new System.Drawing.Size(85, 27);
             this.tbxBid.TabIndex = 17;
-            this.tbxBid.TextChanged += new System.EventHandler(tbxBid_TextChanged);
+            this.tbxBid.TextChanged += new System.EventHandler(this.tbxBid_TextChanged);
+            this.tbxBid.Enter += new System.EventHandler(this.tbxBid_Enter);
+            this.tbxBid.Leave += new System.EventHandler(this.tbxBid_Leave);
             // 
             // labelCurrency
             // 
@@ -276,11 +280,22 @@ namespace BankDepositsApplication
             this.labelMandatoryBid.TabIndex = 26;
             this.labelMandatoryBid.Text = "Обязательное поле";
             // 
+            // chbxCapitalization
+            // 
+            this.chbxCapitalization.Font = new System.Drawing.Font("Times New Roman", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.chbxCapitalization.Location = new System.Drawing.Point(17, 447);
+            this.chbxCapitalization.Name = "chbxCapitalization";
+            this.chbxCapitalization.Size = new System.Drawing.Size(158, 27);
+            this.chbxCapitalization.TabIndex = 27;
+            this.chbxCapitalization.Text = "Капитализация";
+            this.chbxCapitalization.UseVisualStyleBackColor = true;
+            // 
             // AddDepositForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(363, 486);
+            this.Controls.Add(this.chbxCapitalization);
             this.Controls.Add(this.labelMandatoryBid);
             this.Controls.Add(this.labelMandatoryTerm);
             this.Controls.Add(this.labelMandatoryCurrency);
@@ -310,6 +325,8 @@ namespace BankDepositsApplication
             this.ResumeLayout(false);
             this.PerformLayout();
         }
+
+        private System.Windows.Forms.CheckBox chbxCapitalization;
 
         private System.Windows.Forms.Label labelMandatoryDeposit;
         private System.Windows.Forms.Label labelMandatoryCurrency;

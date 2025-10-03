@@ -1,6 +1,6 @@
 namespace BankDepositsApplication.Models
 {
-    internal sealed class CurrencyModel
+    public sealed class CurrencyModel
     {
         internal int DigitalCode { get; set; }
         internal string LetterCode { get; set; }

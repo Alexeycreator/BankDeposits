@@ -1,19 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Windows.Forms;
 using BankDepositsApplication.Models;
+using BankDepositsApplication.WorkFiles;
 using HtmlAgilityPack;
 using NLog;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace BankDepositsApplication.ActionsData
 {
-    internal class CentralBankParser
+    internal class CentralBankParser : DefaultDataCB
     {
         private Logger loggerCentralBankParser = LogManager.GetCurrentClassLogger();
-        private List<CurrencyModel> currencys = new List<CurrencyModel>();
+
+        private readonly string csvFilePath =
+            Path.Combine(Directory.GetCurrentDirectory(), $"Курсы_ЦБ_{dateGetDataCB}.csv");
+
+        private CsvWriter csvWriter = new CsvWriter();
 
         private readonly string urlCentralBank =
             $@"https://www.cbr.ru/currency_base/daily/?UniDbQuery.Posted=True&UniDbQuery.To={dateGetDataCB}";
@@ -21,8 +27,14 @@ namespace BankDepositsApplication.ActionsData
         private static string dateGetDataCB = DateTime.Now.ToShortDateString();
         private readonly HttpClient httpClient = new HttpClient();
         private const int countCells = 5;
+        private List<CurrencyModel> currencys;
 
-        private protected void GetRate()
+        public CentralBankParser(List<CurrencyModel> _currencys) : base(_currencys)
+        {
+            currencys = _currencys;
+        }
+
+        private List<CurrencyModel> GetRate()
         {
             loggerCentralBankParser.Info("Запущен процесс получения курса валют ЦБ РФ...");
             try
@@ -38,10 +50,10 @@ namespace BankDepositsApplication.ActionsData
                         HtmlDocument document = new HtmlDocument();
                         document.LoadHtml(htmlResponse);
                         string elementId = "content";
-                        HtmlNode container = document.GetElementbyId($"{elementId}");
+                        var container = document.GetElementbyId($"{elementId}");
                         if (container != null)
                         {
-                            HtmlNode[] tableBody = document.GetElementbyId("content").ChildNodes.FindFirst("tbody")
+                            var tableBody = document.GetElementbyId("content").ChildNodes.FindFirst("tbody")
                                 .ChildNodes
                                 .Where(x => x.Name == "tr").Skip(1).ToArray();
                             loggerCentralBankParser.Info("Извлечение данных...");
@@ -53,9 +65,9 @@ namespace BankDepositsApplication.ActionsData
                             {
                                 if (_countCells != countCells)
                                 {
-                                    //возвращать старые данные
+                                    currencys = DefaultRate();
                                     throw new ArgumentOutOfRangeException(
-                                        $"Столбцов больше или меньше, чем должно быть. Проверьте структуру сайта.");
+                                        $"Столбцов больше или меньше, чем должно быть. Проверьте структуру сайта. Добавлены данные по умолчанию.");
                                 }
 
                                 foreach (var tableRow in tableBody)
@@ -71,12 +83,13 @@ namespace BankDepositsApplication.ActionsData
                                         LetterCode = cellLetterCode,
                                         Units = Convert.ToInt32(cellUnits),
                                         Currency = cellCurrency,
-                                        Rate = Convert.ToDouble(cellRate),
+                                        Rate = Math.Round(Convert.ToDouble(cellRate), 4)
                                     });
                                 }
 
                                 if (currencys != null)
                                 {
+                                    csvWriter.Writer(csvFilePath, currencys);
                                     loggerCentralBankParser.Info(
                                         $"Данные успешно получены. Количество {currencys.Count} из {allElements}.");
                                 }
@@ -102,6 +115,7 @@ namespace BankDepositsApplication.ActionsData
                 }
                 else
                 {
+                    currencys = DefaultRate();
                     throw new HttpRequestException($"Подключиться не удалось. {httpResponseMessage.StatusCode}");
                 }
             }
@@ -117,13 +131,19 @@ namespace BankDepositsApplication.ActionsData
             {
                 loggerCentralBankParser.Error($"{ex.Message}");
             }
+
+            return currencys;
         }
 
         internal void CB_Parser()
         {
             try
             {
-                GetRate();
+                currencys = GetRate();
+                if (currencys == null || currencys.Count == 0)
+                {
+                    currencys = DefaultRate();
+                }
             }
             catch (Exception ex)
             {

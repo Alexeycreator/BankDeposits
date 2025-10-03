@@ -3,32 +3,31 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BankDepositsApplication.ActionsData;
+using BankDepositsApplication.Models;
+using NLog;
 
 namespace BankDepositsApplication
 {
     public partial class MainForm : Form
     {
-        private string nameBank;
-        private DateTime dateStart;
-        private int term;
-        private decimal deposit;
+        private Logger loggerMainForm = LogManager.GetCurrentClassLogger();
+        private List<CurrencyModel> currencys = new List<CurrencyModel>();
+        private List<BankDepModel> bankDeposits = new List<BankDepModel>();
 
         public MainForm()
         {
             InitializeComponent();
+            loggerMainForm.Info("Приложение запущено.");
         }
 
         #region Methods
-
-        private void InitDataGrid()
-        {
-            RowsDataGridAdded();
-        }
 
         private void ColomnsDataGridAdded()
         {
@@ -43,28 +42,55 @@ namespace BankDepositsApplication
 
         private void RowsDataGridAdded()
         {
-            dgvPrintInfo.Rows[0].Cells["Name"].Value = nameBank;
-            dgvPrintInfo.Rows[0].Cells["Deposit"].Value = deposit;
-            dgvPrintInfo.Rows[0].Cells["Term"].Value = term;
-            dgvPrintInfo.Rows[0].Cells["DateStart"].Value = dateStart;
+            try
+            {
+                foreach (var bankDep in bankDeposits)
+                {
+                    var cellName = bankDep.Name;
+                    var cellDeposit = $"{FormatNumberRows(bankDep.Deposit)} {bankDep.Currency}";
+                    var cellTerm = $"{bankDep.Term} мес";
+                    var cellBid = $"{bankDep.Bid} %";
+                    var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
+                    var cellDateOpen = bankDep.DateOpen.ToShortDateString();
+                    var cellDateClose = bankDep.DateClose.ToShortDateString();
+                    dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
+                        cellDateClose);
+                }
+                SortRowsData();
+            }
+            catch (Exception ex)
+            {
+                loggerMainForm.Error($"{ex.Message}");
+            }
+        }
+
+        private void SortRowsData()
+        {
+            dgvPrintInfo.Sort(dgvPrintInfo.Columns["DateClose"], ListSortDirection.Ascending);
+        }
+
+        private string FormatNumberRows(double value)
+        {
+            return value.ToString("N0", CultureInfo.InvariantCulture);
         }
 
         #endregion
 
-
-        private void btnCalc_Click(object sender, EventArgs e)
-        {
-        }
-
         private void MainForm_Load(object sender, EventArgs e)
         {
             ColomnsDataGridAdded();
+            CentralBankParser cbParser = new CentralBankParser(currencys);
+            cbParser.CB_Parser();
         }
 
         private void btnAddDeposit_Click(object sender, EventArgs e)
         {
-            AddDepositForm addDepositForm = new AddDepositForm();
+            bankDeposits = new List<BankDepModel>();
+            AddDepositForm addDepositForm = new AddDepositForm(currencys, bankDeposits);
             addDepositForm.ShowDialog();
+            CalculationData calcData = new CalculationData(bankDeposits);
+            calcData.GetCalcDeposits();
+            RowsDataGridAdded();
         }
     }
 }
