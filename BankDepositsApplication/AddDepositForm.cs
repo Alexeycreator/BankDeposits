@@ -13,7 +13,13 @@ namespace BankDepositsApplication
         private Logger loggerAddDepositForm = LogManager.GetCurrentClassLogger();
         private List<CurrencyModel> currencys;
         private List<BankDepModel> bankDeposits;
-        private string[] banks = { "Т-Банк", "ПСБ", "Сбербанк" };
+
+        private string[] banks =
+        {
+            "Т-Банк", "ПСБ", "Сбербанк", "Газпромбанк", "МТС Банк", "ВТБ", "Московский кредитный банк (МКБ)",
+            "Альфа-Банк", "Металлинвестбанк", "Ozon Банк", "Совкомбанк", "Уралсиб"
+        };
+
         private MainForm mainForm;
 
         public AddDepositForm(MainForm _mainForm, List<CurrencyModel> _currencys, List<BankDepModel> _bankDeposits)
@@ -109,6 +115,7 @@ namespace BankDepositsApplication
 
         private void AddedCmbxBank(string[] banks)
         {
+            Array.Sort(banks);
             foreach (var bank in banks)
             {
                 cmbxBank.Items.Add(bank);
