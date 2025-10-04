@@ -27,6 +27,7 @@ namespace BankDepositsApplication
         private int retryCount = 0;
         private const int maxRetryes = 3;
         private bool addDep = false;
+        private int indexRow = -1;
 
         private readonly string csvDataTablePath =
             Path.Combine(Directory.GetCurrentDirectory(), "InformationTable.csv");
@@ -34,6 +35,7 @@ namespace BankDepositsApplication
         public MainForm()
         {
             InitializeComponent();
+            btnDelDep.Enabled = false;
             loggerMainForm.Info("Приложение запущено.");
         }
 
@@ -87,6 +89,12 @@ namespace BankDepositsApplication
                         dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
                             cellDateClose);
                     }
+
+                    Thread threadWriter = new Thread(() =>
+                    {
+                        csvWorking.Writer(csvDataTablePath, dgvPrintInfo);
+                    });
+                    threadWriter.Start();
 
                     SortRowsData();
                 }
@@ -185,6 +193,46 @@ namespace BankDepositsApplication
             catch (Exception ex)
             {
                 loggerMainForm.Error($"{ex.Message}");
+            }
+        }
+
+        private void btnDelDep_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show(
+                $"Вы дейстительно хотите удалить вклад {dgvPrintInfo.Rows[indexRow].Cells[0].Value} " +
+                $"с вкладом {dgvPrintInfo.Rows[indexRow].Cells[1].Value}?", "Предупреждение", MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                if (indexRow >= 0)
+                {
+                    dgvPrintInfo.Rows.RemoveAt(indexRow);
+                    dgvPrintInfo.Refresh();
+                    csvWorking.Writer(csvDataTablePath, dgvPrintInfo);
+                }
+
+                else
+                {
+                    MessageBox.Show($"Удаление невозможно, так как строка с индексом {indexRow} не существует.");
+                    loggerMainForm.Error($"Удаление невозможно, так как строка с индексом {indexRow} не существует.");
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        private void dgvPrintInfo_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (dgvPrintInfo.CurrentRow != null && dgvPrintInfo.CurrentRow.Index >= 0)
+            {
+                btnDelDep.Enabled = true;
+                indexRow = dgvPrintInfo.CurrentRow.Index;
+            }
+            else
+            {
+                btnDelDep.Enabled = false;
             }
         }
     }

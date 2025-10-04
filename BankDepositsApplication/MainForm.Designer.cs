@@ -32,6 +32,7 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.dgvPrintInfo = new System.Windows.Forms.DataGridView();
             this.btnAddDeposit = new System.Windows.Forms.Button();
+            this.btnDelDep = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPrintInfo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -53,6 +54,7 @@
             this.dgvPrintInfo.RowTemplate.Height = 24;
             this.dgvPrintInfo.Size = new System.Drawing.Size(976, 370);
             this.dgvPrintInfo.TabIndex = 1;
+            this.dgvPrintInfo.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgvPrintInfo_MouseClick);
             // 
             // btnAddDeposit
             // 
@@ -65,11 +67,23 @@
             this.btnAddDeposit.UseVisualStyleBackColor = true;
             this.btnAddDeposit.Click += new System.EventHandler(this.btnAddDeposit_Click);
             // 
+            // btnDelDep
+            // 
+            this.btnDelDep.Font = new System.Drawing.Font("Times New Roman", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnDelDep.Location = new System.Drawing.Point(682, 388);
+            this.btnDelDep.Name = "btnDelDep";
+            this.btnDelDep.Size = new System.Drawing.Size(150, 39);
+            this.btnDelDep.TabIndex = 12;
+            this.btnDelDep.Text = "Удалить вклад";
+            this.btnDelDep.UseVisualStyleBackColor = true;
+            this.btnDelDep.Click += new System.EventHandler(this.btnDelDep_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1000, 439);
+            this.Controls.Add(this.btnDelDep);
             this.Controls.Add(this.btnAddDeposit);
             this.Controls.Add(this.dgvPrintInfo);
             this.Name = "MainForm";
@@ -78,6 +92,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvPrintInfo)).EndInit();
             this.ResumeLayout(false);
         }
+
+        private System.Windows.Forms.Button btnDelDep;
 
         private System.Windows.Forms.Button btnAddDeposit;
 

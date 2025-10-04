@@ -66,17 +66,24 @@ namespace BankDepositsApplication.ActionsData
                 {
                     var line = sr.ReadLine();
                     var values = line.Split(';');
-                    bankDeposits.Add(new BankDepModel
+                    if (Convert.ToDateTime(values[6].Trim()) < DateTime.Now)
                     {
-                        Name = values[0].Trim(),
-                        Deposit = Convert.ToDouble(RemovedCharacters(values[1])),
-                        Term = Convert.ToInt32(RemovedCharacters(values[2])),
-                        Bid = Convert.ToDouble(RemovedCharacters(values[3].Replace(".", ","))),
-                        TotalDeposit = Convert.ToDouble(RemovedCharacters(values[4])),
-                        DateOpen = Convert.ToDateTime(values[5].Trim()),
-                        DateClose = Convert.ToDateTime(values[6].Trim()),
-                        CsvCurrency = RemovedNumbers(values[1].Trim())
-                    });
+                        continue;
+                    }
+                    else
+                    {
+                        bankDeposits.Add(new BankDepModel
+                        {
+                            Name = values[0].Trim(),
+                            Deposit = Convert.ToDouble(RemovedCharacters(values[1])),
+                            Term = Convert.ToInt32(RemovedCharacters(values[2])),
+                            Bid = Convert.ToDouble(RemovedCharacters(values[3].Replace(".", ","))),
+                            TotalDeposit = Convert.ToDouble(RemovedCharacters(values[4])),
+                            DateOpen = Convert.ToDateTime(values[5].Trim()),
+                            DateClose = Convert.ToDateTime(values[6].Trim()),
+                            CsvCurrency = RemovedNumbers(values[1].Trim())
+                        });
+                    }
                 }
             }
 
