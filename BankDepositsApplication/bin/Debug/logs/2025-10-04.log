@@ -35,3 +35,11 @@
 2025-10-04 09:13:35.0357 INFO Подключение прошло успешно. OK
 2025-10-04 09:13:35.0876 INFO Извлечение данных...
 2025-10-04 09:13:35.1046 INFO Данные успешно получены. Количество 55 из 55.
+2025-10-04 10:47:50.8694 INFO Приложение запущено.
+2025-10-04 10:47:51.8396 INFO Запущен процесс получения курса валют ЦБ РФ...
+2025-10-04 10:47:51.8396 INFO Подключение по адресу: https://www.cbr.ru/currency_base/daily/?UniDbQuery.Posted=True&UniDbQuery.To=04.10.2025
+2025-10-04 10:47:52.2054 INFO Подключение прошло успешно. OK
+2025-10-04 10:47:52.2676 INFO Извлечение данных...
+2025-10-04 10:47:52.2997 INFO Удален файл C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\bin\Debug\Курсы_ЦБ_03.10.2025.csv
+2025-10-04 10:47:52.2997 INFO Удален файл C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\bin\Debug\Курсы_ЦБ_04.10.2025.csv
+2025-10-04 10:47:52.2997 INFO Данные успешно получены. Количество 55 из 55.

@@ -5,14 +5,17 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BankDepositsApplication.Models;
+using NLog;
 
 namespace BankDepositsApplication.ActionsData
 {
     internal sealed class CsvWorking
     {
+        private Logger loggerCsvWorking = LogManager.GetCurrentClassLogger();
+
         internal void Writer(string csvFilePath, List<CurrencyModel> currencys)
         {
-            CheckExistsFile(csvFilePath);
+            DeleteFileCB();
             StringBuilder csvBuilder = new StringBuilder();
             csvBuilder.AppendLine("DigitalCode;LetterCode;Units;Currency;Rate");
             foreach (var currency in currencys)
@@ -24,9 +27,8 @@ namespace BankDepositsApplication.ActionsData
             File.WriteAllText(csvFilePath, csvBuilder.ToString());
         }
 
-        internal void Writer(string csvFilePath, List<BankDepModel> bankDeposits, DataGridView dataDeposits)
+        internal void Writer(string csvFilePath, DataGridView dataDeposits)
         {
-            CheckExistsFile(csvFilePath);
             StringBuilder csvBuilder = new StringBuilder();
             csvBuilder.AppendLine("Name;Deposit;Term;Bid;TotalDeposit;DateOpen;DateClose");
 
@@ -81,11 +83,22 @@ namespace BankDepositsApplication.ActionsData
             return bankDeposits;
         }
 
-        private void CheckExistsFile(string filePath)
+        private void DeleteFileCB()
         {
-            if (!File.Exists(filePath))
+            string dirPath = Path.Combine(Directory.GetCurrentDirectory());
+            string file = "Курсы*.csv";
+            try
             {
-                File.Create(filePath);
+                string[] files = Directory.GetFiles(dirPath, file);
+                foreach (var item in files)
+                {
+                    File.Delete(item);
+                    loggerCsvWorking.Info($"Удален файл {item}");
+                }
+            }
+            catch (Exception ex)
+            {
+                loggerCsvWorking.Error($"{ex.Message}");
             }
         }
 

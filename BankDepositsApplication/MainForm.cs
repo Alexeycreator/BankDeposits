@@ -70,7 +70,7 @@ namespace BankDepositsApplication
                     }
 
                     SortRowsData();
-                    csvWorking.Writer(csvDataTablePath, bankDeposits, dgvPrintInfo);
+                    csvWorking.Writer(csvDataTablePath, dgvPrintInfo);
                 }
                 else
                 {

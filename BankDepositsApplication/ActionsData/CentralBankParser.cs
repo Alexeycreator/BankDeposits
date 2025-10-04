@@ -116,7 +116,9 @@ namespace BankDepositsApplication.ActionsData
                 else
                 {
                     currencys = DefaultRate();
-                    throw new HttpRequestException($"Подключиться не удалось. {httpResponseMessage.StatusCode}");
+                    csvWorking.Writer(csvFilePath, currencys);
+                    throw new HttpRequestException(
+                        $"Подключиться не удалось. {httpResponseMessage.StatusCode}. Добавлены данные по умолчанию.");
                 }
             }
             catch (HtmlWebException hwEx)
