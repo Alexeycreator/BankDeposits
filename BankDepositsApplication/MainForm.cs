@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,10 +22,14 @@ namespace BankDepositsApplication
         private Logger loggerMainForm = LogManager.GetCurrentClassLogger();
         private List<CurrencyModel> currencys = new List<CurrencyModel>();
         private List<BankDepModel> bankDeposits = new List<BankDepModel>();
+        private CsvWorking csvWorking = new CsvWorking();
         public event Action<List<CurrencyModel>> CurrencyDataReady;
-
         private int retryCount = 0;
         private const int maxRetryes = 3;
+        private bool addDep = false;
+
+        private readonly string csvDataTablePath =
+            Path.Combine(Directory.GetCurrentDirectory(), "InformationTable.csv");
 
         public MainForm()
         {
@@ -45,24 +50,46 @@ namespace BankDepositsApplication
             dgvPrintInfo.Columns.Add("DateClose", "Дата закрытия вклада");
         }
 
-        private void RowsDataGridAdded()
+        private void RowsDataGridAdded(bool addDep)
         {
             try
             {
-                foreach (var bankDep in bankDeposits)
+                if (addDep)
                 {
-                    var cellName = bankDep.Name;
-                    var cellDeposit = $"{FormatNumberRows(bankDep.Deposit)} {bankDep.Currency}";
-                    var cellTerm = $"{bankDep.Term} мес";
-                    var cellBid = $"{bankDep.Bid} %";
-                    var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
-                    var cellDateOpen = bankDep.DateOpen.ToShortDateString();
-                    var cellDateClose = bankDep.DateClose.ToShortDateString();
-                    dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
-                        cellDateClose);
-                }
+                    foreach (var bankDep in bankDeposits)
+                    {
+                        var cellName = bankDep.Name;
+                        var cellDeposit = $"{FormatNumberRows(bankDep.Deposit)} {bankDep.Currency}";
+                        var cellTerm = $"{bankDep.Term} мес";
+                        var cellBid = $"{bankDep.Bid} %";
+                        var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
+                        var cellDateOpen = bankDep.DateOpen.ToShortDateString();
+                        var cellDateClose = bankDep.DateClose.ToShortDateString();
+                        dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
+                            cellDateClose);
+                    }
 
-                SortRowsData();
+                    SortRowsData();
+                    csvWorking.Writer(csvDataTablePath, bankDeposits, dgvPrintInfo);
+                }
+                else
+                {
+                    bankDeposits = csvWorking.Reader(csvDataTablePath, bankDeposits);
+                    foreach (var bankDep in bankDeposits)
+                    {
+                        var cellName = bankDep.Name;
+                        var cellDeposit = $"{FormatNumberRows(bankDep.Deposit)} {bankDep.CsvCurrency}";
+                        var cellTerm = $"{bankDep.Term} мес";
+                        var cellBid = $"{bankDep.Bid} %";
+                        var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
+                        var cellDateOpen = bankDep.DateOpen.ToShortDateString();
+                        var cellDateClose = bankDep.DateClose.ToShortDateString();
+                        dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
+                            cellDateClose);
+                    }
+
+                    SortRowsData();
+                }
             }
             catch (Exception ex)
             {
@@ -72,6 +99,18 @@ namespace BankDepositsApplication
 
         private void SortRowsData()
         {
+            foreach (DataGridViewRow row in dgvPrintInfo.Rows)
+            {
+                if (!row.IsNewRow && row.Cells["DateClose"].Value != null)
+                {
+                    if (DateTime.TryParse(row.Cells["DateClose"].Value.ToString(), out DateTime dateValue))
+                    {
+                        row.Cells["DateClose"].Value = dateValue;
+                    }
+                }
+            }
+
+            dgvPrintInfo.Columns["DateClose"].DefaultCellStyle.Format = "dd.MM.yyyy";
             dgvPrintInfo.Sort(dgvPrintInfo.Columns["DateClose"], ListSortDirection.Ascending);
         }
 
@@ -106,6 +145,8 @@ namespace BankDepositsApplication
             try
             {
                 ColomnsDataGridAdded();
+                RowsDataGridAdded(addDep);
+                addDep = true;
                 StartParserThread();
             }
             catch (ThreadStartException tse)
@@ -139,7 +180,7 @@ namespace BankDepositsApplication
                 addDepositForm.ShowDialog();
                 CalculationData calcData = new CalculationData(bankDeposits);
                 calcData.GetCalcDeposits();
-                RowsDataGridAdded();
+                RowsDataGridAdded(addDep);
             }
             catch (Exception ex)
             {

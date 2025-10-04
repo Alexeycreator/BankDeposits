@@ -74,7 +74,7 @@
         <Compile Include="Models\CurrencyModel.cs" />
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="WorkFiles\CsvWriter.cs" />
+        <Compile Include="WorkFiles\CsvWorking.cs" />
         <Compile Include="WorkFiles\DefaultDataCB.cs" />
         <EmbeddedResource Include="AddDepositForm.resx">
           <DependentUpon>AddDepositForm.cs</DependentUpon>

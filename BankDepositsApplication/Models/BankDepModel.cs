@@ -14,5 +14,6 @@ namespace BankDepositsApplication.Models
         internal double TotalDeposit { get; set; }
         internal DateTime DateClose { get; set; }
         internal bool Capitalization { get; set; }
+        internal string CsvCurrency { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace BankDepositsApplication.ActionsData
         private readonly string csvFilePath =
             Path.Combine(Directory.GetCurrentDirectory(), $"Курсы_ЦБ_{dateGetDataCB}.csv");
 
-        private CsvWriter csvWriter = new CsvWriter();
+        private CsvWorking csvWorking = new CsvWorking();
 
         private readonly string urlCentralBank =
             $@"https://www.cbr.ru/currency_base/daily/?UniDbQuery.Posted=True&UniDbQuery.To={dateGetDataCB}";
@@ -89,7 +89,7 @@ namespace BankDepositsApplication.ActionsData
 
                                 if (currencys != null)
                                 {
-                                    csvWriter.Writer(csvFilePath, currencys);
+                                    csvWorking.Writer(csvFilePath, currencys);
                                     loggerCentralBankParser.Info(
                                         $"Данные успешно получены. Количество {currencys.Count} из {allElements}.");
                                 }
