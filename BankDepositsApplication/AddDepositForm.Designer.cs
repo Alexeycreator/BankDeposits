@@ -31,6 +31,7 @@ namespace BankDepositsApplication
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddDepositForm));
             this.labelTitle = new System.Windows.Forms.Label();
             this.labelBank = new System.Windows.Forms.Label();
             this.labelDeposit = new System.Windows.Forms.Label();
@@ -319,6 +320,7 @@ namespace BankDepositsApplication
             this.Controls.Add(this.labelDeposit);
             this.Controls.Add(this.labelBank);
             this.Controls.Add(this.labelTitle);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AddDepositForm";
             this.Text = "Добавление вклада";
             this.Load += new System.EventHandler(this.AddDepositForm_Load);

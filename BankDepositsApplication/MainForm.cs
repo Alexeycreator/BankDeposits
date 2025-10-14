@@ -50,6 +50,7 @@ namespace BankDepositsApplication
             dgvPrintInfo.Columns.Add("TotalDeposit", "Итоговая сумма");
             dgvPrintInfo.Columns.Add("DateOpen", "Дата открытия вклада");
             dgvPrintInfo.Columns.Add("DateClose", "Дата закрытия вклада");
+            loggerMainForm.Info($"Заголовки таблицы добавлены.");
         }
 
         private void RowsDataGridAdded(bool addDep)
@@ -67,11 +68,16 @@ namespace BankDepositsApplication
                         var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
-                        dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
-                            cellDateClose);
+                        int rowIndex = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
+                            cellDateOpen, cellDateClose);
+                        DateTime targetDate = Convert.ToDateTime(cellDateClose);
+                        DateTime dateToday = DateTime.Today;
+                        CheckColorRows(targetDate, dateToday, rowIndex);
                     }
 
+                    loggerMainForm.Info($"Строки таблицы добавлены.");
                     SortRowsData();
+                    loggerMainForm.Info($"Строки таблицы отсортированы.");
                     csvWorking.Writer(csvDataTablePath, dgvPrintInfo);
                 }
                 else
@@ -86,14 +92,27 @@ namespace BankDepositsApplication
                         var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
-                        dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit, cellDateOpen,
-                            cellDateClose);
+                        int rowIndex = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
+                            cellDateOpen, cellDateClose);
+                        switch (bankDep.ColorRows)
+                        {
+                            case "R":
+                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Red;
+                                break;
+                            case "Y":
+                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                                break;
+                            case "G":
+                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Green;
+                                break;
+                            default:
+                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.White;
+                                loggerMainForm.Error($"Цвет не задан для строки {bankDep.Name}");
+                                break;
+                        }
                     }
 
-                    Thread threadWriter = new Thread(() =>
-                    {
-                        csvWorking.Writer(csvDataTablePath, dgvPrintInfo);
-                    });
+                    Thread threadWriter = new Thread(() => { csvWorking.Writer(csvDataTablePath, dgvPrintInfo); });
                     threadWriter.Start();
 
                     SortRowsData();
@@ -220,6 +239,22 @@ namespace BankDepositsApplication
             else
             {
                 return;
+            }
+        }
+
+        private void CheckColorRows(DateTime tDate, DateTime dToday, int rIndex)
+        {
+            if (tDate >= dToday.AddDays(3))
+            {
+                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Green;
+            }
+            else if (tDate < dToday)
+            {
+                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Red;
+            }
+            else
+            {
+                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Yellow;
             }
         }
 

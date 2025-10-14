@@ -2,18 +2,19 @@ using System;
 
 namespace BankDepositsApplication.Models
 {
-    public class BankDepModel
+    public sealed class BankDepModel
     {
-        internal string Name { get; set; }
-        internal double Deposit { get; set; }
-        internal string Currency { get; set; }
-        internal double Rate { get; set; }
-        internal int Term { get; set; }
-        internal double Bid { get; set; }
-        internal DateTime DateOpen { get; set; }
-        internal double TotalDeposit { get; set; }
-        internal DateTime DateClose { get; set; }
-        internal bool Capitalization { get; set; }
-        internal string CsvCurrency { get; set; }
+        public string Name { get; set; }
+        public double Deposit { get; set; }
+        public string Currency { get; set; }
+        public double Rate { get; set; }
+        public int Term { get; set; }
+        public double Bid { get; set; }
+        public DateTime DateOpen { get; set; }
+        public double TotalDeposit { get; set; }
+        public DateTime DateClose { get; set; }
+        public bool Capitalization { get; set; }
+        public string CsvCurrency { get; set; }
+        public string ColorRows { get; set; }
     }
 }

@@ -122,7 +122,7 @@ namespace BankDepositsApplication
             }
         }
 
-        public List<BankDepModel> AddBankDeposit()
+        private List<BankDepModel> AddBankDeposit()
         {
             try
             {

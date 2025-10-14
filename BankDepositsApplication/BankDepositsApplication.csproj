@@ -12,6 +12,7 @@
         <FileAlignment>512</FileAlignment>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <Deterministic>true</Deterministic>
+        <ApplicationIcon>image\iconApp.ico</ApplicationIcon>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -74,6 +75,7 @@
         <Compile Include="Models\CurrencyModel.cs" />
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
+        <Compile Include="VariableColor.cs" />
         <Compile Include="WorkFiles\CsvWorking.cs" />
         <Compile Include="WorkFiles\DefaultDataCB.cs" />
         <EmbeddedResource Include="AddDepositForm.resx">
@@ -91,6 +93,8 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>Resources.resx</DependentUpon>
         </Compile>
+        <None Include="image\iconApp.ico" />
+        <None Include="image\iconApp.jpg" />
         <None Include="NLog.config">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

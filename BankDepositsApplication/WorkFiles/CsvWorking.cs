@@ -66,24 +66,34 @@ namespace BankDepositsApplication.ActionsData
                 {
                     var line = sr.ReadLine();
                     var values = line.Split(';');
-                    if (Convert.ToDateTime(values[6].Trim()) < DateTime.Now)
+                    VariableColor colorRows;
+                    DateTime targetDate = Convert.ToDateTime(values[6].Trim());
+                    DateTime dateToday = DateTime.Today;
+                    if (targetDate < dateToday)
                     {
-                        continue;
+                        colorRows = VariableColor.R;
+                    }
+                    else if (targetDate >= dateToday.AddDays(3))
+                    {
+                        colorRows = VariableColor.G;
                     }
                     else
                     {
-                        bankDeposits.Add(new BankDepModel
-                        {
-                            Name = values[0].Trim(),
-                            Deposit = Convert.ToDouble(RemovedCharacters(values[1])),
-                            Term = Convert.ToInt32(RemovedCharacters(values[2])),
-                            Bid = Convert.ToDouble(RemovedCharacters(values[3].Replace(".", ","))),
-                            TotalDeposit = Convert.ToDouble(RemovedCharacters(values[4])),
-                            DateOpen = Convert.ToDateTime(values[5].Trim()),
-                            DateClose = Convert.ToDateTime(values[6].Trim()),
-                            CsvCurrency = RemovedNumbers(values[1].Trim())
-                        });
+                        colorRows = VariableColor.Y;
                     }
+
+                    bankDeposits.Add(new BankDepModel()
+                    {
+                        Name = values[0].Trim(),
+                        Deposit = Convert.ToDouble(RemovedCharacters(values[1])),
+                        Term = Convert.ToInt32(RemovedCharacters(values[2])),
+                        Bid = Convert.ToDouble(RemovedCharacters(values[3].Replace(".", ","))),
+                        TotalDeposit = Convert.ToDouble(RemovedCharacters(values[4])),
+                        DateOpen = Convert.ToDateTime(values[5].Trim()),
+                        DateClose = targetDate,
+                        CsvCurrency = RemovedNumbers(values[1].Trim()),
+                        ColorRows = colorRows.ToString(),
+                    });
                 }
             }
 
