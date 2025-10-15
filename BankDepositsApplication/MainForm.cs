@@ -28,6 +28,8 @@ namespace BankDepositsApplication
         private const int maxRetryes = 3;
         private bool addDep = false;
         private int indexRow = -1;
+        private int colorDep = 0;
+        private int countRedDep = 0;
 
         private readonly string csvDataTablePath =
             Path.Combine(Directory.GetCurrentDirectory(), "InformationTable.csv");
@@ -35,6 +37,7 @@ namespace BankDepositsApplication
         public MainForm()
         {
             InitializeComponent();
+            SettingsDataGrid();
             btnDelDep.Enabled = false;
             loggerMainForm.Info("Приложение запущено.");
         }
@@ -51,6 +54,43 @@ namespace BankDepositsApplication
             dgvPrintInfo.Columns.Add("DateOpen", "Дата открытия вклада");
             dgvPrintInfo.Columns.Add("DateClose", "Дата закрытия вклада");
             loggerMainForm.Info($"Заголовки таблицы добавлены.");
+        }
+
+        private void SettingsDataGrid()
+        {
+            dgvPrintInfo.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dgvPrintInfo.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgvPrintInfo.Font = new Font("Times New Roman", 12f);
+            dgvPrintInfo.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvPrintInfo.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvPrintInfo.RowHeadersVisible = false;
+            dgvPrintInfo.AllowUserToAddRows = false;
+        }
+
+        private void CheckValidateDeposits(int colorDeposit, int countRedDeposits)
+        {
+            if (countRedDeposits > 0)
+            {
+                MessageBox.Show($"У вас {countRedDeposits} не закрытых вкладов, срок которых уже истек.",
+                    "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            /*DialogResult validateDepResult =
+                MessageBox.Show($"У вас {countRedDeposits} не закрытых вкладов, срок которых уже истек.",
+                    "Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if (validateDepResult == DialogResult.OK)
+            {
+                this.Focus();
+                /*switch (colorDeposit)
+                {
+                    case 1:
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        break;
+                    default: break;
+                }#1#
+            }*/
         }
 
         private void RowsDataGridAdded(bool addDep)
@@ -98,12 +138,16 @@ namespace BankDepositsApplication
                         {
                             case "R":
                                 dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Red;
+                                colorDep = (int)VariableColor.R;
+                                countRedDep++;
                                 break;
                             case "Y":
                                 dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                                colorDep = (int)VariableColor.Y;
                                 break;
                             case "G":
                                 dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Green;
+                                colorDep = (int)VariableColor.G;
                                 break;
                             default:
                                 dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.White;
@@ -114,7 +158,6 @@ namespace BankDepositsApplication
 
                     Thread threadWriter = new Thread(() => { csvWorking.Writer(csvDataTablePath, dgvPrintInfo); });
                     threadWriter.Start();
-
                     SortRowsData();
                 }
             }
@@ -269,6 +312,11 @@ namespace BankDepositsApplication
             {
                 btnDelDep.Enabled = false;
             }
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            CheckValidateDeposits(colorDep, countRedDep);
         }
     }
 }

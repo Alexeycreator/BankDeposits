@@ -91,6 +91,7 @@
             this.Name = "MainForm";
             this.Text = "Таблица вкладов";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Shown += new System.EventHandler(this.MainForm_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPrintInfo)).EndInit();
             this.ResumeLayout(false);
         }
