@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -317,6 +318,31 @@ namespace BankDepositsApplication
         private void MainForm_Shown(object sender, EventArgs e)
         {
             CheckValidateDeposits(colorDep, countRedDep);
+        }
+
+        //такой метод уже есть, надо выносить его отдельно
+        private string RemovedCharacters(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            return Regex.Replace(value, @"[^\d.]", "");
+        }
+
+        private void dgvPrintInfo_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            string bankName = dgvPrintInfo.Rows[e.RowIndex].Cells["Name"].Value.ToString();
+            double deposit =
+                Convert.ToDouble(
+                    RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value.ToString()));
+            int term = Convert.ToInt32(RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Term"].Value.ToString()));
+            double bid =
+                Convert.ToDouble(RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value.ToString()));
+            DateTime dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[e.RowIndex].Cells["DateOpen"].Value.ToString());
+            InformationForm infoForm = new InformationForm(bankName, deposit, term, bid, dateOpen);
+            infoForm.ShowDialog();
         }
     }
 }

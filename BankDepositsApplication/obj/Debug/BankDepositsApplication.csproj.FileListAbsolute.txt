@@ -19,3 +19,4 @@ C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsAp
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\bin\Debug\NLog.xml
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepo.C33877FC.Up2Date
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\bin\Debug\NLog.config
+C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.InformationForm.resources

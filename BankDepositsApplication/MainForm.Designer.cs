@@ -55,6 +55,7 @@
             this.dgvPrintInfo.RowTemplate.Height = 24;
             this.dgvPrintInfo.Size = new System.Drawing.Size(995, 370);
             this.dgvPrintInfo.TabIndex = 1;
+            this.dgvPrintInfo.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvPrintInfo_CellMouseDoubleClick);
             this.dgvPrintInfo.MouseClick += new System.Windows.Forms.MouseEventHandler(this.dgvPrintInfo_MouseClick);
             // 
             // btnAddDeposit
@@ -75,7 +76,7 @@
             this.btnDelDep.Name = "btnDelDep";
             this.btnDelDep.Size = new System.Drawing.Size(150, 39);
             this.btnDelDep.TabIndex = 12;
-            this.btnDelDep.Text = "Удалить вклад";
+            this.btnDelDep.Text = "Закрыть вклад";
             this.btnDelDep.UseVisualStyleBackColor = true;
             this.btnDelDep.Click += new System.EventHandler(this.btnDelDep_Click);
             // 
