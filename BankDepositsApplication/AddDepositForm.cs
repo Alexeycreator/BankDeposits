@@ -10,6 +10,8 @@ namespace BankDepositsApplication
 {
     public partial class AddDepositForm : Form
     {
+        #region Fields
+
         private Logger loggerAddDepositForm = LogManager.GetCurrentClassLogger();
         private List<CurrencyModel> currencys;
         private List<BankDepModel> bankDeposits;
@@ -22,6 +24,10 @@ namespace BankDepositsApplication
 
         private MainForm mainForm;
 
+        #endregion
+
+        #region Constructors
+
         public AddDepositForm(MainForm _mainForm, List<CurrencyModel> _currencys, List<BankDepModel> _bankDeposits)
         {
             mainForm = _mainForm;
@@ -31,13 +37,8 @@ namespace BankDepositsApplication
             mainForm.CurrencyDataReady += OnCurrencyDataReady;
         }
 
-        private void AddDepositForm_Load(object sender, EventArgs e)
-        {
-            SettingsElementsForm();
-            AddedCmbxBank(banks);
-            AddedCmbxCurrency(currencys);
-        }
-
+        #endregion
+        
         #region Settings
 
         private void OnCurrencyDataReady(List<CurrencyModel> data)
@@ -200,8 +201,6 @@ namespace BankDepositsApplication
                         }
                     }
                 }
-
-                //Добавить enum для банков
             }
             catch (Exception ex)
             {
@@ -215,6 +214,13 @@ namespace BankDepositsApplication
 
         #region Elements Handlers
 
+        private void AddDepositForm_Load(object sender, EventArgs e)
+        {
+            SettingsElementsForm();
+            AddedCmbxBank(banks);
+            AddedCmbxCurrency(currencys);
+        }
+        
         private void cmbxBank_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(cmbxBank.Text))

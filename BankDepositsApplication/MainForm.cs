@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BankDepositsApplication.ActionsData;
+using BankDepositsApplication.MethodsForms;
 using BankDepositsApplication.Models;
 using NLog;
 
@@ -20,10 +21,13 @@ namespace BankDepositsApplication
 {
     public partial class MainForm : Form
     {
+        #region Fields
+
         private Logger loggerMainForm = LogManager.GetCurrentClassLogger();
         private List<CurrencyModel> currencys = new List<CurrencyModel>();
         private List<BankDepModel> bankDeposits = new List<BankDepModel>();
         private CsvWorking csvWorking = new CsvWorking();
+        private GeneralsMethods genMethods = new GeneralsMethods();
         public event Action<List<CurrencyModel>> CurrencyDataReady;
         private int retryCount = 0;
         private const int maxRetryes = 3;
@@ -35,6 +39,10 @@ namespace BankDepositsApplication
         private readonly string csvDataTablePath =
             Path.Combine(Directory.GetCurrentDirectory(), "InformationTable.csv");
 
+        #endregion
+
+        #region Constructors
+
         public MainForm()
         {
             InitializeComponent();
@@ -43,8 +51,21 @@ namespace BankDepositsApplication
             loggerMainForm.Info("Приложение запущено.");
         }
 
-        #region Methods
+        #endregion
+        
+        #region Settings Form
 
+        private void SettingsDataGrid()
+        {
+            dgvPrintInfo.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+            dgvPrintInfo.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgvPrintInfo.Font = new Font("Times New Roman", 12f);
+            dgvPrintInfo.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvPrintInfo.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dgvPrintInfo.RowHeadersVisible = false;
+            dgvPrintInfo.AllowUserToAddRows = false;
+        }
+        
         private void ColomnsDataGridAdded()
         {
             dgvPrintInfo.Columns.Add("Name", "Наименование банка");
@@ -57,17 +78,10 @@ namespace BankDepositsApplication
             loggerMainForm.Info($"Заголовки таблицы добавлены.");
         }
 
-        private void SettingsDataGrid()
-        {
-            dgvPrintInfo.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dgvPrintInfo.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            dgvPrintInfo.Font = new Font("Times New Roman", 12f);
-            dgvPrintInfo.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dgvPrintInfo.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dgvPrintInfo.RowHeadersVisible = false;
-            dgvPrintInfo.AllowUserToAddRows = false;
-        }
+        #endregion
 
+        #region Methods
+        
         private void CheckValidateDeposits(int colorDeposit, int countRedDeposits)
         {
             if (countRedDeposits > 0)
@@ -208,39 +222,26 @@ namespace BankDepositsApplication
             });
             test.Start();
         }
+        
+        private void CheckColorRows(DateTime tDate, DateTime dToday, int rIndex)
+        {
+            if (tDate >= dToday.AddDays(3))
+            {
+                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Green;
+            }
+            else if (tDate < dToday)
+            {
+                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Red;
+            }
+            else
+            {
+                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Yellow;
+            }
+        }
 
         #endregion
 
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-            try
-            {
-                ColomnsDataGridAdded();
-                RowsDataGridAdded(addDep);
-                addDep = true;
-                StartParserThread();
-            }
-            catch (ThreadStartException tse)
-            {
-                loggerMainForm.Error($"{tse.Message}");
-
-                if (retryCount < maxRetryes)
-                {
-                    retryCount++;
-                    loggerMainForm.Info($"Повторная попытка {retryCount} из {maxRetryes}");
-                    Thread.Sleep(1000);
-                    StartParserThread();
-                }
-                else
-                {
-                    loggerMainForm.Error("Превышено максимальное количество попыток");
-                }
-            }
-            catch (Exception ex)
-            {
-                loggerMainForm.Error($"{ex.Message}");
-            }
-        }
+        #region Buttons Action
 
         private void btnAddDeposit_Click(object sender, EventArgs e)
         {
@@ -286,20 +287,44 @@ namespace BankDepositsApplication
             }
         }
 
-        private void CheckColorRows(DateTime tDate, DateTime dToday, int rIndex)
+        #endregion
+
+        #region Elements Handlers
+
+        private void MainForm_Load(object sender, EventArgs e)
         {
-            if (tDate >= dToday.AddDays(3))
+            try
             {
-                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Green;
+                ColomnsDataGridAdded();
+                RowsDataGridAdded(addDep);
+                addDep = true;
+                StartParserThread();
             }
-            else if (tDate < dToday)
+            catch (ThreadStartException tse)
             {
-                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Red;
+                loggerMainForm.Error($"{tse.Message}");
+
+                if (retryCount < maxRetryes)
+                {
+                    retryCount++;
+                    loggerMainForm.Info($"Повторная попытка {retryCount} из {maxRetryes}");
+                    Thread.Sleep(1000);
+                    StartParserThread();
+                }
+                else
+                {
+                    loggerMainForm.Error("Превышено максимальное количество попыток");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                loggerMainForm.Error($"{ex.Message}");
             }
+        }
+
+        private void MainForm_Shown(object sender, EventArgs e)
+        {
+            CheckValidateDeposits(colorDep, countRedDep);
         }
 
         private void dgvPrintInfo_MouseClick(object sender, MouseEventArgs e)
@@ -315,34 +340,47 @@ namespace BankDepositsApplication
             }
         }
 
-        private void MainForm_Shown(object sender, EventArgs e)
-        {
-            CheckValidateDeposits(colorDep, countRedDep);
-        }
-
-        //такой метод уже есть, надо выносить его отдельно
-        private string RemovedCharacters(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return Regex.Replace(value, @"[^\d.]", "");
-        }
-
         private void dgvPrintInfo_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            string bankName = dgvPrintInfo.Rows[e.RowIndex].Cells["Name"].Value.ToString();
-            double deposit =
-                Convert.ToDouble(
-                    RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value.ToString()));
-            int term = Convert.ToInt32(RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Term"].Value.ToString()));
-            double bid =
-                Convert.ToDouble(RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value.ToString()));
-            DateTime dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[e.RowIndex].Cells["DateOpen"].Value.ToString());
-            InformationForm infoForm = new InformationForm(bankName, deposit, term, bid, dateOpen);
+            Color color = dgvPrintInfo.Rows[e.RowIndex].DefaultCellStyle.BackColor;
+            string bankName;
+            double deposit;
+            int term;
+            double bid;
+            DateTime dateOpen;
+            string currency;
+            if (color.Name == "Red")
+            {
+                bankName = dgvPrintInfo.Rows[e.RowIndex].Cells["Name"].Value.ToString();
+                deposit = Convert.ToDouble(
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value.ToString()));
+                term = Convert.ToInt32(
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Term"].Value.ToString()));
+                bid = Convert.ToDouble(
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value
+                        .ToString())); // это можно поменять на реальный процент
+                dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[e.RowIndex].Cells["DateClose"].Value.ToString());
+                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value
+                    .ToString());
+            }
+            else
+            {
+                bankName = dgvPrintInfo.Rows[e.RowIndex].Cells["Name"].Value.ToString();
+                deposit = Convert.ToDouble(
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Deposit"].Value.ToString()));
+                term = Convert.ToInt32(
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Term"].Value.ToString()));
+                bid = Convert.ToDouble(
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value.ToString()));
+                dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[e.RowIndex].Cells["DateOpen"].Value.ToString());
+                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value
+                    .ToString());
+            }
+
+            InformationForm infoForm = new InformationForm(bankName, deposit, term, bid, dateOpen, currency);
             infoForm.ShowDialog();
         }
+
+        #endregion
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using BankDepositsApplication.MethodsForms;
 using BankDepositsApplication.Models;
 using NLog;
 
@@ -12,6 +13,7 @@ namespace BankDepositsApplication.ActionsData
     internal sealed class CsvWorking
     {
         private Logger loggerCsvWorking = LogManager.GetCurrentClassLogger();
+        private GeneralsMethods genMethods = new GeneralsMethods();
 
         internal void Writer(string csvFilePath, List<CurrencyModel> currencys)
         {
@@ -85,13 +87,13 @@ namespace BankDepositsApplication.ActionsData
                     bankDeposits.Add(new BankDepModel()
                     {
                         Name = values[0].Trim(),
-                        Deposit = Convert.ToDouble(RemovedCharacters(values[1])),
-                        Term = Convert.ToInt32(RemovedCharacters(values[2])),
-                        Bid = Convert.ToDouble(RemovedCharacters(values[3].Replace(".", ","))),
-                        TotalDeposit = Convert.ToDouble(RemovedCharacters(values[4])),
+                        Deposit = Convert.ToDouble(genMethods.RemovedCharacters(values[1])),
+                        Term = Convert.ToInt32(genMethods.RemovedCharacters(values[2])),
+                        Bid = Convert.ToDouble(genMethods.RemovedCharacters(values[3].Replace(".", ","))),
+                        TotalDeposit = Convert.ToDouble(genMethods.RemovedCharacters(values[4])),
                         DateOpen = Convert.ToDateTime(values[5].Trim()),
                         DateClose = targetDate,
-                        CsvCurrency = RemovedNumbers(values[1].Trim()),
+                        CsvCurrency = genMethods.RemovedNumbers(values[1].Trim()),
                         ColorRows = colorRows.ToString(),
                     });
                 }
@@ -117,26 +119,6 @@ namespace BankDepositsApplication.ActionsData
             {
                 loggerCsvWorking.Error($"{ex.Message}");
             }
-        }
-
-        private string RemovedCharacters(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return Regex.Replace(value, @"[^\d.]", "");
-        }
-
-        private string RemovedNumbers(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return Regex.Replace(value, @"[^a-zA-Zа-яА-Я]", "");
         }
     }
 }

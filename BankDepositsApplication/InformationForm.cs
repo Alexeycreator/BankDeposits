@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using NLog.LayoutRenderers;
 
 namespace BankDepositsApplication
 {
@@ -10,14 +11,16 @@ namespace BankDepositsApplication
         private int _term;
         private double _bid;
         private DateTime _date;
+        private string _currency;
 
-        public InformationForm(string bankName, double deposit, int term, double bid, DateTime date)
+        public InformationForm(string bankName, double deposit, int term, double bid, DateTime date, string currency)
         {
             _bankName = bankName;
             _deposit = deposit;
             _term = term;
             _bid = bid;
             _date = date;
+            _currency = currency;
             InitializeComponent();
         }
 
@@ -30,6 +33,7 @@ namespace BankDepositsApplication
             tbxTerm.Text = _term.ToString();
             tbxBid.Text = _bid.ToString();
             dtpDateOpen.Value = _date;
+            tbxCurrency.Text = _currency;
         }
     }
 }
