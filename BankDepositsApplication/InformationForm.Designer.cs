@@ -143,6 +143,7 @@ namespace BankDepositsApplication
             this.tbxCurrency.Name = "tbxCurrency";
             this.tbxCurrency.Size = new System.Drawing.Size(85, 27);
             this.tbxCurrency.TabIndex = 43;
+            this.tbxCurrency.TextChanged += new System.EventHandler(this.tbxCurrency_TextChanged);
             // 
             // labelCurrency
             // 

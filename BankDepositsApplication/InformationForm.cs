@@ -334,5 +334,20 @@ namespace BankDepositsApplication
         private void chbxCapitalization_CheckedChanged(object sender, EventArgs e)
         {
         }
+
+        private void tbxCurrency_TextChanged(object sender, EventArgs e)
+        {
+            if (tbxCurrency.Text == "руб")
+            {
+                updatedRate = 1;
+            }
+            else
+            {
+                foreach (var cur in currencys.Where(cur => tbxCurrency.Text == cur.LetterCode))
+                {
+                    updatedRate = cur.Rate;
+                }
+            }
+        }
     }
 }

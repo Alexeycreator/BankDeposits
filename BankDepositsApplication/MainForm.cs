@@ -37,6 +37,7 @@ namespace BankDepositsApplication
         private int countRedDep = 0;
         private bool capitalize = false;
         private int rowIndexAdded = 0;
+        private static readonly SemaphoreSlim writeLock = new SemaphoreSlim(1, 1);
 
         private readonly string csvDataTablePath =
             Path.Combine(Directory.GetCurrentDirectory(), "InformationTable.csv");
@@ -130,7 +131,8 @@ namespace BankDepositsApplication
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
                         capitalize = bankDep.Capitalization ? true : false;
-                        rowIndexAdded = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
+                        rowIndexAdded = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid,
+                            cellTotalDeposit,
                             cellDateOpen, cellDateClose);
                         DateTime targetDate = Convert.ToDateTime(cellDateClose);
                         DateTime dateToday = DateTime.Today;
@@ -155,7 +157,8 @@ namespace BankDepositsApplication
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
                         capitalize = bankDep.Capitalization ? true : false;
-                        rowIndexAdded = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
+                        rowIndexAdded = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid,
+                            cellTotalDeposit,
                             cellDateOpen, cellDateClose);
                         switch (bankDep.ColorRows)
                         {
@@ -251,7 +254,8 @@ namespace BankDepositsApplication
                     $"{genMethods.FormatNumberRows(updatedData.Deposit)} {updatedData.Currency}";
                 dgvPrintInfo.Rows[rowIndex].Cells["Term"].Value = $"{updatedData.Term} мес";
                 dgvPrintInfo.Rows[rowIndex].Cells["Bid"].Value = $"{updatedData.Bid} %";
-                string calcTotalDep = genMethods.FormatNumberRows(genMethods.CalculationTotalDeposit(updatedData.Deposit,
+                string calcTotalDep = genMethods.FormatNumberRows(genMethods.CalculationTotalDeposit(
+                    updatedData.Deposit,
                     updatedData.Rate, updatedData.Bid, updatedData.Term, updatedData.Capitalization));
                 dgvPrintInfo.Rows[rowIndex].Cells["TotalDeposit"].Value =
                     $"{calcTotalDep} руб";
@@ -414,11 +418,27 @@ namespace BankDepositsApplication
                 capitalize = dep.Capitalization;
             }
 
-            InformationForm infoForm = new InformationForm(bankName, deposit, term, bid, dateOpen, currency, capitalize, currencys);
+            InformationForm infoForm =
+                new InformationForm(bankName, deposit, term, bid, dateOpen, currency, capitalize, currencys);
             infoForm.DepositUpdated += (s, args) => { UpdateDataGridRow(currentRowIndex, args); };
+            infoForm.FormClosed += async (s, args) => { await WriterChangeDataDeposit(); };
             infoForm.ShowDialog();
         }
 
         #endregion
+
+        private async Task WriterChangeDataDeposit()
+        {
+            await writeLock.WaitAsync();
+
+            try
+            {
+                await Task.Run(() => { csvWorking.Writer(csvDataTablePath, dgvPrintInfo); });
+            }
+            finally
+            {
+                writeLock.Release();
+            }
+        }
     }
 }
