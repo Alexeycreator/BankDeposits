@@ -41,7 +41,6 @@ namespace BankDepositsApplication
             this.chBxCurrency = new System.Windows.Forms.CheckBox();
             this.tbxCurrency = new System.Windows.Forms.TextBox();
             this.labelCurrency = new System.Windows.Forms.Label();
-            this.tbxBid = new System.Windows.Forms.TextBox();
             this.dtpDateOpen = new System.Windows.Forms.DateTimePicker();
             this.rBtnDays = new System.Windows.Forms.RadioButton();
             this.tbxTerm = new System.Windows.Forms.TextBox();
@@ -49,12 +48,13 @@ namespace BankDepositsApplication
             this.labelBid = new System.Windows.Forms.Label();
             this.labelTerm = new System.Windows.Forms.Label();
             this.tbxDeposit = new System.Windows.Forms.TextBox();
-            this.btnAddDeposit = new System.Windows.Forms.Button();
+            this.btnChangeDeposit = new System.Windows.Forms.Button();
             this.rBtnMonth = new System.Windows.Forms.RadioButton();
             this.cmbxBank = new System.Windows.Forms.ComboBox();
             this.labelDeposit = new System.Windows.Forms.Label();
             this.labelBank = new System.Windows.Forms.Label();
             this.labelTitle = new System.Windows.Forms.Label();
+            this.tbxBid = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // chbxCapitalization
@@ -66,6 +66,7 @@ namespace BankDepositsApplication
             this.chbxCapitalization.TabIndex = 51;
             this.chbxCapitalization.Text = "Капитализация";
             this.chbxCapitalization.UseVisualStyleBackColor = true;
+            this.chbxCapitalization.CheckedChanged += new System.EventHandler(this.chbxCapitalization_CheckedChanged);
             // 
             // labelMandatoryBid
             // 
@@ -120,6 +121,8 @@ namespace BankDepositsApplication
             this.cmbxCurrency.Name = "cmbxCurrency";
             this.cmbxCurrency.Size = new System.Drawing.Size(337, 27);
             this.cmbxCurrency.TabIndex = 45;
+            this.cmbxCurrency.Enter += new System.EventHandler(this.cmbxCurrency_Enter);
+            this.cmbxCurrency.Leave += new System.EventHandler(this.cmbxCurrency_Leave);
             // 
             // chBxCurrency
             // 
@@ -130,6 +133,7 @@ namespace BankDepositsApplication
             this.chBxCurrency.TabIndex = 44;
             this.chBxCurrency.Text = "Другая валюта";
             this.chBxCurrency.UseVisualStyleBackColor = true;
+            this.chBxCurrency.CheckedChanged += new System.EventHandler(this.chBxCurrency_CheckedChanged);
             // 
             // tbxCurrency
             // 
@@ -147,14 +151,6 @@ namespace BankDepositsApplication
             this.labelCurrency.Size = new System.Drawing.Size(72, 23);
             this.labelCurrency.TabIndex = 42;
             this.labelCurrency.Text = "Валюта";
-            // 
-            // tbxBid
-            // 
-            this.tbxBid.Font = new System.Drawing.Font("Times New Roman", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.tbxBid.Location = new System.Drawing.Point(98, 343);
-            this.tbxBid.Name = "tbxBid";
-            this.tbxBid.Size = new System.Drawing.Size(85, 27);
-            this.tbxBid.TabIndex = 41;
             // 
             // dtpDateOpen
             // 
@@ -183,6 +179,8 @@ namespace BankDepositsApplication
             this.tbxTerm.Name = "tbxTerm";
             this.tbxTerm.Size = new System.Drawing.Size(85, 27);
             this.tbxTerm.TabIndex = 38;
+            this.tbxTerm.Enter += new System.EventHandler(this.tbxTerm_Enter);
+            this.tbxTerm.Leave += new System.EventHandler(this.tbxTerm_Leave);
             // 
             // labelDateOpen
             // 
@@ -218,16 +216,19 @@ namespace BankDepositsApplication
             this.tbxDeposit.Name = "tbxDeposit";
             this.tbxDeposit.Size = new System.Drawing.Size(168, 27);
             this.tbxDeposit.TabIndex = 34;
+            this.tbxDeposit.Enter += new System.EventHandler(this.tbxDeposit_Enter);
+            this.tbxDeposit.Leave += new System.EventHandler(this.tbxDeposit_Leave);
             // 
-            // btnAddDeposit
+            // btnChangeDeposit
             // 
-            this.btnAddDeposit.Font = new System.Drawing.Font("Times New Roman", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnAddDeposit.Location = new System.Drawing.Point(186, 439);
-            this.btnAddDeposit.Name = "btnAddDeposit";
-            this.btnAddDeposit.Size = new System.Drawing.Size(171, 40);
-            this.btnAddDeposit.TabIndex = 33;
-            this.btnAddDeposit.Text = "Добавить вклад";
-            this.btnAddDeposit.UseVisualStyleBackColor = true;
+            this.btnChangeDeposit.Font = new System.Drawing.Font("Times New Roman", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnChangeDeposit.Location = new System.Drawing.Point(186, 439);
+            this.btnChangeDeposit.Name = "btnChangeDeposit";
+            this.btnChangeDeposit.Size = new System.Drawing.Size(171, 40);
+            this.btnChangeDeposit.TabIndex = 33;
+            this.btnChangeDeposit.Text = "Изменить вклад";
+            this.btnChangeDeposit.UseVisualStyleBackColor = true;
+            this.btnChangeDeposit.Click += new System.EventHandler(this.btnChangeDeposit_Click);
             // 
             // rBtnMonth
             // 
@@ -248,6 +249,8 @@ namespace BankDepositsApplication
             this.cmbxBank.Name = "cmbxBank";
             this.cmbxBank.Size = new System.Drawing.Size(283, 27);
             this.cmbxBank.TabIndex = 31;
+            this.cmbxBank.Enter += new System.EventHandler(this.cmbxBank_Enter);
+            this.cmbxBank.Leave += new System.EventHandler(this.cmbxBank_Leave);
             // 
             // labelDeposit
             // 
@@ -277,11 +280,23 @@ namespace BankDepositsApplication
             this.labelTitle.TabIndex = 28;
             this.labelTitle.Text = "Изменение вклада";
             // 
+            // tbxBid
+            // 
+            this.tbxBid.Font = new System.Drawing.Font("Times New Roman", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tbxBid.Location = new System.Drawing.Point(93, 343);
+            this.tbxBid.Name = "tbxBid";
+            this.tbxBid.Size = new System.Drawing.Size(85, 27);
+            this.tbxBid.TabIndex = 52;
+            this.tbxBid.TextChanged += new System.EventHandler(this.tbxBid_TextChanged);
+            this.tbxBid.Enter += new System.EventHandler(this.tbxBid_Enter);
+            this.tbxBid.Leave += new System.EventHandler(this.tbxBid_Leave);
+            // 
             // InformationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(373, 495);
+            this.Controls.Add(this.tbxBid);
             this.Controls.Add(this.chbxCapitalization);
             this.Controls.Add(this.labelMandatoryBid);
             this.Controls.Add(this.labelMandatoryTerm);
@@ -292,7 +307,6 @@ namespace BankDepositsApplication
             this.Controls.Add(this.chBxCurrency);
             this.Controls.Add(this.tbxCurrency);
             this.Controls.Add(this.labelCurrency);
-            this.Controls.Add(this.tbxBid);
             this.Controls.Add(this.dtpDateOpen);
             this.Controls.Add(this.rBtnDays);
             this.Controls.Add(this.tbxTerm);
@@ -300,7 +314,7 @@ namespace BankDepositsApplication
             this.Controls.Add(this.labelBid);
             this.Controls.Add(this.labelTerm);
             this.Controls.Add(this.tbxDeposit);
-            this.Controls.Add(this.btnAddDeposit);
+            this.Controls.Add(this.btnChangeDeposit);
             this.Controls.Add(this.rBtnMonth);
             this.Controls.Add(this.cmbxBank);
             this.Controls.Add(this.labelDeposit);
@@ -313,6 +327,8 @@ namespace BankDepositsApplication
             this.PerformLayout();
         }
 
+        private System.Windows.Forms.TextBox tbxBid;
+
         private System.Windows.Forms.CheckBox chbxCapitalization;
         private System.Windows.Forms.Label labelMandatoryBid;
         private System.Windows.Forms.Label labelMandatoryTerm;
@@ -323,7 +339,6 @@ namespace BankDepositsApplication
         private System.Windows.Forms.CheckBox chBxCurrency;
         private System.Windows.Forms.TextBox tbxCurrency;
         private System.Windows.Forms.Label labelCurrency;
-        private System.Windows.Forms.TextBox tbxBid;
         private System.Windows.Forms.DateTimePicker dtpDateOpen;
         private System.Windows.Forms.RadioButton rBtnDays;
         private System.Windows.Forms.TextBox tbxTerm;
@@ -331,7 +346,7 @@ namespace BankDepositsApplication
         private System.Windows.Forms.Label labelBid;
         private System.Windows.Forms.Label labelTerm;
         private System.Windows.Forms.TextBox tbxDeposit;
-        private System.Windows.Forms.Button btnAddDeposit;
+        private System.Windows.Forms.Button btnChangeDeposit;
         private System.Windows.Forms.RadioButton rBtnMonth;
         private System.Windows.Forms.ComboBox cmbxBank;
         private System.Windows.Forms.Label labelDeposit;

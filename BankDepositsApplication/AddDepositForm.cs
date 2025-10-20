@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using BankDepositsApplication.ActionsData;
+using BankDepositsApplication.MethodsForms;
 using BankDepositsApplication.Models;
 using NLog;
 
@@ -15,6 +16,7 @@ namespace BankDepositsApplication
         private Logger loggerAddDepositForm = LogManager.GetCurrentClassLogger();
         private List<CurrencyModel> currencys;
         private List<BankDepModel> bankDeposits;
+        private GeneralsMethods genMethods = new GeneralsMethods();
 
         private string[] banks =
         {
@@ -38,7 +40,7 @@ namespace BankDepositsApplication
         }
 
         #endregion
-        
+
         #region Settings
 
         private void OnCurrencyDataReady(List<CurrencyModel> data)
@@ -94,16 +96,6 @@ namespace BankDepositsApplication
         #endregion
 
         #region Methods
-
-        private bool IsParseInt(string text)
-        {
-            return Int32.TryParse(text, out int value);
-        }
-
-        private bool IsParseDouble(string text)
-        {
-            return Double.TryParse(text, out double value);
-        }
 
         private void AddedCmbxCurrency(List<CurrencyModel> currencys)
         {
@@ -220,7 +212,7 @@ namespace BankDepositsApplication
             AddedCmbxBank(banks);
             AddedCmbxCurrency(currencys);
         }
-        
+
         private void cmbxBank_Leave(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(cmbxBank.Text))
@@ -259,7 +251,7 @@ namespace BankDepositsApplication
                 tbxDeposit.ForeColor = Color.Gray;
             }
 
-            if (tbxDeposit.Text != null && IsParseInt(tbxDeposit.Text))
+            if (tbxDeposit.Text != null && genMethods.IsParseInt(tbxDeposit.Text))
             {
                 btnAddDeposit.Enabled = true;
                 labelMandatoryDeposit.Visible = false;
@@ -273,7 +265,7 @@ namespace BankDepositsApplication
 
         private void tbxDeposit_Enter(object sender, EventArgs e)
         {
-            if (!IsParseInt(tbxDeposit.Text))
+            if (!genMethods.IsParseInt(tbxDeposit.Text))
             {
                 tbxDeposit.Text = null;
             }
@@ -341,7 +333,7 @@ namespace BankDepositsApplication
                 tbxTerm.ForeColor = Color.Gray;
             }
 
-            if (tbxTerm != null && IsParseInt(tbxTerm.Text))
+            if (tbxTerm != null && genMethods.IsParseInt(tbxTerm.Text))
             {
                 btnAddDeposit.Enabled = true;
                 labelMandatoryTerm.Visible = false;
@@ -355,7 +347,7 @@ namespace BankDepositsApplication
 
         private void tbxTerm_Enter(object sender, EventArgs e)
         {
-            if (!IsParseInt(tbxTerm.Text))
+            if (!genMethods.IsParseInt(tbxTerm.Text))
             {
                 tbxTerm.Text = null;
             }
@@ -371,7 +363,7 @@ namespace BankDepositsApplication
                 tbxBid.ForeColor = Color.Gray;
             }
 
-            if (tbxTerm != null && IsParseInt(tbxTerm.Text))
+            if (tbxTerm != null && genMethods.IsParseInt(tbxTerm.Text))
             {
                 btnAddDeposit.Enabled = true;
                 labelMandatoryBid.Visible = false;
@@ -385,7 +377,7 @@ namespace BankDepositsApplication
 
         private void tbxBid_Enter(object sender, EventArgs e)
         {
-            if (!IsParseDouble(tbxBid.Text))
+            if (!genMethods.IsParseDouble(tbxBid.Text))
             {
                 tbxBid.Text = null;
             }

@@ -80,6 +80,7 @@
         <Compile Include="MethodsForms\GeneralsMethods.cs" />
         <Compile Include="Models\BankDepModel.cs" />
         <Compile Include="Models\CurrencyModel.cs" />
+        <Compile Include="Models\DepositUpdatedEventArgs.cs" />
         <Compile Include="Program.cs"/>
         <Compile Include="Properties\AssemblyInfo.cs"/>
         <Compile Include="VariableColor.cs" />

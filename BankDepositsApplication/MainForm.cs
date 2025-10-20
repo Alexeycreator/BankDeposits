@@ -35,6 +35,8 @@ namespace BankDepositsApplication
         private int indexRow = -1;
         private int colorDep = 0;
         private int countRedDep = 0;
+        private bool capitalize = false;
+        private int rowIndexAdded = 0;
 
         private readonly string csvDataTablePath =
             Path.Combine(Directory.GetCurrentDirectory(), "InformationTable.csv");
@@ -46,16 +48,16 @@ namespace BankDepositsApplication
         public MainForm()
         {
             InitializeComponent();
-            SettingsDataGrid();
+            DataGridSettings();
             btnDelDep.Enabled = false;
             loggerMainForm.Info("Приложение запущено.");
         }
 
         #endregion
-        
+
         #region Settings Form
 
-        private void SettingsDataGrid()
+        private void DataGridSettings()
         {
             dgvPrintInfo.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvPrintInfo.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
@@ -65,7 +67,7 @@ namespace BankDepositsApplication
             dgvPrintInfo.RowHeadersVisible = false;
             dgvPrintInfo.AllowUserToAddRows = false;
         }
-        
+
         private void ColomnsDataGridAdded()
         {
             dgvPrintInfo.Columns.Add("Name", "Наименование банка");
@@ -78,10 +80,14 @@ namespace BankDepositsApplication
             loggerMainForm.Info($"Заголовки таблицы добавлены.");
         }
 
+        private void PanelSettings()
+        {
+        }
+
         #endregion
 
         #region Methods
-        
+
         private void CheckValidateDeposits(int colorDeposit, int countRedDeposits)
         {
             if (countRedDeposits > 0)
@@ -117,17 +123,18 @@ namespace BankDepositsApplication
                     foreach (var bankDep in bankDeposits)
                     {
                         var cellName = bankDep.Name;
-                        var cellDeposit = $"{FormatNumberRows(bankDep.Deposit)} {bankDep.Currency}";
+                        var cellDeposit = $"{genMethods.FormatNumberRows(bankDep.Deposit)} {bankDep.Currency}";
                         var cellTerm = $"{bankDep.Term} мес";
                         var cellBid = $"{bankDep.Bid} %";
-                        var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
+                        var cellTotalDeposit = $"{genMethods.FormatNumberRows(bankDep.TotalDeposit)} руб";
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
-                        int rowIndex = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
+                        capitalize = bankDep.Capitalization ? true : false;
+                        rowIndexAdded = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
                             cellDateOpen, cellDateClose);
                         DateTime targetDate = Convert.ToDateTime(cellDateClose);
                         DateTime dateToday = DateTime.Today;
-                        CheckColorRows(targetDate, dateToday, rowIndex);
+                        CheckColorRows(targetDate, dateToday, rowIndexAdded);
                     }
 
                     loggerMainForm.Info($"Строки таблицы добавлены.");
@@ -141,31 +148,32 @@ namespace BankDepositsApplication
                     foreach (var bankDep in bankDeposits)
                     {
                         var cellName = bankDep.Name;
-                        var cellDeposit = $"{FormatNumberRows(bankDep.Deposit)} {bankDep.CsvCurrency}";
+                        var cellDeposit = $"{genMethods.FormatNumberRows(bankDep.Deposit)} {bankDep.CsvCurrency}";
                         var cellTerm = $"{bankDep.Term} мес";
                         var cellBid = $"{bankDep.Bid} %";
-                        var cellTotalDeposit = $"{FormatNumberRows(bankDep.TotalDeposit)} руб";
+                        var cellTotalDeposit = $"{genMethods.FormatNumberRows(bankDep.TotalDeposit)} руб";
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
-                        int rowIndex = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
+                        capitalize = bankDep.Capitalization ? true : false;
+                        rowIndexAdded = dgvPrintInfo.Rows.Add(cellName, cellDeposit, cellTerm, cellBid, cellTotalDeposit,
                             cellDateOpen, cellDateClose);
                         switch (bankDep.ColorRows)
                         {
                             case "R":
-                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Red;
+                                dgvPrintInfo.Rows[rowIndexAdded].DefaultCellStyle.BackColor = Color.Red;
                                 colorDep = (int)VariableColor.R;
                                 countRedDep++;
                                 break;
                             case "Y":
-                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Yellow;
+                                dgvPrintInfo.Rows[rowIndexAdded].DefaultCellStyle.BackColor = Color.Yellow;
                                 colorDep = (int)VariableColor.Y;
                                 break;
                             case "G":
-                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.Green;
+                                dgvPrintInfo.Rows[rowIndexAdded].DefaultCellStyle.BackColor = Color.Green;
                                 colorDep = (int)VariableColor.G;
                                 break;
                             default:
-                                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = Color.White;
+                                dgvPrintInfo.Rows[rowIndexAdded].DefaultCellStyle.BackColor = Color.White;
                                 loggerMainForm.Error($"Цвет не задан для строки {bankDep.Name}");
                                 break;
                         }
@@ -199,11 +207,6 @@ namespace BankDepositsApplication
             dgvPrintInfo.Sort(dgvPrintInfo.Columns["DateClose"], ListSortDirection.Ascending);
         }
 
-        private string FormatNumberRows(double value)
-        {
-            return value.ToString("N0", CultureInfo.InvariantCulture);
-        }
-
         private void StartParserThread()
         {
             Thread test = new Thread(() =>
@@ -222,7 +225,7 @@ namespace BankDepositsApplication
             });
             test.Start();
         }
-        
+
         private void CheckColorRows(DateTime tDate, DateTime dToday, int rIndex)
         {
             if (tDate >= dToday.AddDays(3))
@@ -236,6 +239,28 @@ namespace BankDepositsApplication
             else
             {
                 dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Yellow;
+            }
+        }
+
+        private void UpdateDataGridRow(int rowIndex, DepositUpdatedEventArgs updatedData)
+        {
+            try
+            {
+                dgvPrintInfo.Rows[rowIndex].Cells["Name"].Value = updatedData.BankName;
+                dgvPrintInfo.Rows[rowIndex].Cells["Deposit"].Value =
+                    $"{genMethods.FormatNumberRows(updatedData.Deposit)} {updatedData.Currency}";
+                dgvPrintInfo.Rows[rowIndex].Cells["Term"].Value = $"{updatedData.Term} мес";
+                dgvPrintInfo.Rows[rowIndex].Cells["Bid"].Value = $"{updatedData.Bid} %";
+                string calcTotalDep = genMethods.FormatNumberRows(genMethods.CalculationTotalDeposit(updatedData.Deposit,
+                    updatedData.Rate, updatedData.Bid, updatedData.Term, updatedData.Capitalization));
+                dgvPrintInfo.Rows[rowIndex].Cells["TotalDeposit"].Value =
+                    $"{calcTotalDep} руб";
+                dgvPrintInfo.Rows[rowIndex].Cells["DateOpen"].Value = updatedData.DateOpen.ToShortDateString();
+                dgvPrintInfo.Rows[rowIndex].Cells["DateClose"].Value = updatedData.DateClose;
+            }
+            catch (Exception ex)
+            {
+                loggerMainForm.Error($"{ex.Message}");
             }
         }
 
@@ -342,6 +367,12 @@ namespace BankDepositsApplication
 
         private void dgvPrintInfo_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            int currentRowIndex = e.RowIndex;
+            if (currentRowIndex < 0)
+            {
+                return;
+            }
+
             Color color = dgvPrintInfo.Rows[e.RowIndex].DefaultCellStyle.BackColor;
             string bankName;
             double deposit;
@@ -353,14 +384,15 @@ namespace BankDepositsApplication
             {
                 bankName = dgvPrintInfo.Rows[e.RowIndex].Cells["Name"].Value.ToString();
                 deposit = Convert.ToDouble(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value.ToString()));
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["TotalDeposit"].Value
+                        .ToString()));
                 term = Convert.ToInt32(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Term"].Value.ToString()));
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["Term"].Value.ToString()));
                 bid = Convert.ToDouble(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value
+                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["Bid"].Value
                         .ToString())); // это можно поменять на реальный процент
-                dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[e.RowIndex].Cells["DateClose"].Value.ToString());
-                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value
+                dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[currentRowIndex].Cells["DateClose"].Value.ToString());
+                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[currentRowIndex].Cells["TotalDeposit"].Value
                     .ToString());
             }
             else
@@ -373,11 +405,17 @@ namespace BankDepositsApplication
                 bid = Convert.ToDouble(
                     genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value.ToString()));
                 dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[e.RowIndex].Cells["DateOpen"].Value.ToString());
-                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[e.RowIndex].Cells["TotalDeposit"].Value
+                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[e.RowIndex].Cells["Deposit"].Value
                     .ToString());
             }
 
-            InformationForm infoForm = new InformationForm(bankName, deposit, term, bid, dateOpen, currency);
+            foreach (var dep in bankDeposits.Where(dep => rowIndexAdded == currentRowIndex))
+            {
+                capitalize = dep.Capitalization;
+            }
+
+            InformationForm infoForm = new InformationForm(bankName, deposit, term, bid, dateOpen, currency, capitalize, currencys);
+            infoForm.DepositUpdated += (s, args) => { UpdateDataGridRow(currentRowIndex, args); };
             infoForm.ShowDialog();
         }
 
