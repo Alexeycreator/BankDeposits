@@ -7,7 +7,6 @@ C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsAp
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.csproj.CoreCompileInputs.cache
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.exe
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.pdb
-C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.exe.config
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.MainForm.resources
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.AddDepositForm.resources
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\bin\Debug\HtmlAgilityPack.dll
@@ -20,3 +19,4 @@ C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsAp
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepo.C33877FC.Up2Date
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\bin\Debug\NLog.config
 C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.InformationForm.resources
+C:\Users\Алексей\Desktop\Учеба\github\BankDepositsApp\BankDepositsApplication\BankDepositsApplication\obj\Debug\BankDepositsApplication.exe.config

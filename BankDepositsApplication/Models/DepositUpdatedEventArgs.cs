@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 
 namespace BankDepositsApplication.Models
 {
@@ -13,5 +14,6 @@ namespace BankDepositsApplication.Models
         public string Currency { get; set; }
         public double Rate { get; set; }
         public bool Capitalization { get; set; }
+        public Color ColorRow { get; set; }
     }
 }

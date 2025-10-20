@@ -83,6 +83,14 @@ namespace BankDepositsApplication
 
         private void PanelSettings()
         {
+            btnAddDeposit.Location = new Point(panelButtons.Width - btnAddDeposit.Width - 10, 10);
+            btnAddDeposit.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+
+            btnDelDep.Location = new Point(panelButtons.Width - btnDelDep.Width - btnAddDeposit.Width - 10, 10);
+            btnDelDep.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+
+            dgvPrintInfo.Location = new Point(panelDataGrid.Width - dgvPrintInfo.Width);
+            dgvPrintInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         }
 
         #endregion
@@ -261,10 +269,25 @@ namespace BankDepositsApplication
                     $"{calcTotalDep} руб";
                 dgvPrintInfo.Rows[rowIndex].Cells["DateOpen"].Value = updatedData.DateOpen.ToShortDateString();
                 dgvPrintInfo.Rows[rowIndex].Cells["DateClose"].Value = updatedData.DateClose;
+                dgvPrintInfo.Rows[rowIndex].DefaultCellStyle.BackColor = updatedData.ColorRow;
             }
             catch (Exception ex)
             {
                 loggerMainForm.Error($"{ex.Message}");
+            }
+        }
+
+        private async Task WriterChangeDataDeposit()
+        {
+            await writeLock.WaitAsync();
+
+            try
+            {
+                await Task.Run(() => { csvWorking.Writer(csvDataTablePath, dgvPrintInfo); });
+            }
+            finally
+            {
+                writeLock.Release();
             }
         }
 
@@ -326,6 +349,9 @@ namespace BankDepositsApplication
             {
                 ColomnsDataGridAdded();
                 RowsDataGridAdded(addDep);
+                dgvPrintInfo.Refresh();
+                dgvPrintInfo.PerformLayout();
+                PanelSettings();
                 addDep = true;
                 StartParserThread();
             }
@@ -398,6 +424,7 @@ namespace BankDepositsApplication
                 dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[currentRowIndex].Cells["DateClose"].Value.ToString());
                 currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[currentRowIndex].Cells["TotalDeposit"].Value
                     .ToString());
+                
             }
             else
             {
@@ -426,19 +453,5 @@ namespace BankDepositsApplication
         }
 
         #endregion
-
-        private async Task WriterChangeDataDeposit()
-        {
-            await writeLock.WaitAsync();
-
-            try
-            {
-                await Task.Run(() => { csvWorking.Writer(csvDataTablePath, dgvPrintInfo); });
-            }
-            finally
-            {
-                writeLock.Release();
-            }
-        }
     }
 }

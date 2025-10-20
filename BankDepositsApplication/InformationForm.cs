@@ -25,6 +25,7 @@ namespace BankDepositsApplication
         private List<CurrencyModel> currencys;
         private List<BankDepModel> bankDeposits;
         private double updatedRate = 1;
+        private Color updatedColorRow;
         public event EventHandler<DepositUpdatedEventArgs> DepositUpdated;
 
         #endregion
@@ -291,6 +292,18 @@ namespace BankDepositsApplication
             DateTime updatedDateClose = updatedDateOpen.AddMonths(updatedTerm);
             string updatedCurrency = tbxCurrency.Text;
             bool updatedCapitalization = chbxCapitalization.Checked;
+            if (updatedDateClose >= DateTime.Today.AddDays(3))
+            {
+                updatedColorRow = Color.Green;
+            }
+            else if (updatedDateClose < DateTime.Today)
+            {
+                updatedColorRow = Color.Red;
+            }
+            else
+            {
+                updatedColorRow = Color.Yellow;
+            }
 
             /*foreach (var cur in currencys.Where(cur => updatedCurrency == _currency))
             {
@@ -307,7 +320,8 @@ namespace BankDepositsApplication
                 DateClose = updatedDateClose,
                 Currency = updatedCurrency,
                 Capitalization = updatedCapitalization,
-                Rate = updatedRate
+                Rate = updatedRate,
+                ColorRow = updatedColorRow
             });
         }
 
