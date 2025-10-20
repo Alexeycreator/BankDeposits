@@ -121,6 +121,7 @@ namespace BankDepositsApplication
             this.cmbxCurrency.Name = "cmbxCurrency";
             this.cmbxCurrency.Size = new System.Drawing.Size(337, 27);
             this.cmbxCurrency.TabIndex = 45;
+            this.cmbxCurrency.SelectedIndexChanged += new System.EventHandler(this.cmbxCurrency_SelectedIndexChanged);
             this.cmbxCurrency.Enter += new System.EventHandler(this.cmbxCurrency_Enter);
             this.cmbxCurrency.Leave += new System.EventHandler(this.cmbxCurrency_Leave);
             // 

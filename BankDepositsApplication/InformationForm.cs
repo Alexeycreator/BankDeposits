@@ -168,32 +168,12 @@ namespace BankDepositsApplication
                 cmbxCurrency.ForeColor = Color.Gray;
             }
 
-            if (cmbxCurrency.SelectedItem != null)
-            {
-                if (cmbxCurrency.Text == "Российский рубль")
-                {
-                    tbxCurrency.Text = "руб";
-                    updatedRate = 1;
-                }
-                else
-                {
-                    foreach (var currency in currencys.Where(currency =>
-                                 cmbxCurrency.SelectedItem.ToString() == currency.Currency))
-                    {
-                        tbxCurrency.Text = currency.LetterCode;
-                        updatedRate = currency.Rate;
-                    }
-                }
+            UpdateCurrencyInfo();
+        }
 
-
-                btnChangeDeposit.Enabled = true;
-                labelMandatoryCurrency.Visible = false;
-            }
-            else
-            {
-                btnChangeDeposit.Enabled = false;
-                labelMandatoryCurrency.Visible = true;
-            }
+        private void cmbxCurrency_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateCurrencyInfo();
         }
 
         private void tbxTerm_Enter(object sender, EventArgs e)
@@ -270,6 +250,36 @@ namespace BankDepositsApplication
         #endregion
 
         #region Methods
+
+        private void UpdateCurrencyInfo()
+        {
+            if (cmbxCurrency.SelectedItem != null)
+            {
+                if (cmbxCurrency.Text == "Российский рубль")
+                {
+                    tbxCurrency.Text = "руб";
+                    updatedRate = 1;
+                }
+                else
+                {
+                    foreach (var currency in currencys.Where(currency =>
+                                 cmbxCurrency.SelectedItem.ToString() == currency.Currency))
+                    {
+                        tbxCurrency.Text = currency.LetterCode;
+                        updatedRate = currency.Rate;
+                    }
+                }
+
+
+                btnChangeDeposit.Enabled = true;
+                labelMandatoryCurrency.Visible = false;
+            }
+            else
+            {
+                btnChangeDeposit.Enabled = false;
+                labelMandatoryCurrency.Visible = true;
+            }
+        }
 
         private void ChangeBankDeposit()
         {

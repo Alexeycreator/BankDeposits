@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using BankDepositsApplication.ActionsData;
 using BankDepositsApplication.MethodsForms;
@@ -96,6 +97,27 @@ namespace BankDepositsApplication
         #endregion
 
         #region Methods
+
+        private void UpdateCurrencyInfo()
+        {
+            if (cmbxCurrency.SelectedItem != null)
+            {
+                foreach (var currency in currencys.Where(currency =>
+                             cmbxCurrency.SelectedItem.ToString() == currency.Currency))
+                {
+                    tbxCurrency.Text = currency.LetterCode;
+                }
+
+                btnAddDeposit.Enabled = true;
+                labelMandatoryCurrency.Visible = false;
+            }
+            else
+            {
+                tbxCurrency.Text = "руб";
+                btnAddDeposit.Enabled = false;
+                labelMandatoryCurrency.Visible = true;
+            }
+        }
 
         private void AddedCmbxCurrency(List<CurrencyModel> currencys)
         {
@@ -294,25 +316,7 @@ namespace BankDepositsApplication
                 cmbxCurrency.ForeColor = Color.Gray;
             }
 
-            if (cmbxCurrency.SelectedItem != null)
-            {
-                foreach (var currency in currencys)
-                {
-                    if (cmbxCurrency.SelectedItem.ToString() == currency.Currency)
-                    {
-                        tbxCurrency.Text = currency.LetterCode;
-                    }
-                }
-
-                btnAddDeposit.Enabled = true;
-                labelMandatoryCurrency.Visible = false;
-            }
-            else
-            {
-                tbxCurrency.Text = "руб";
-                btnAddDeposit.Enabled = false;
-                labelMandatoryCurrency.Visible = true;
-            }
+            UpdateCurrencyInfo();
         }
 
         private void cmbxCurrency_Enter(object sender, EventArgs e)
@@ -323,6 +327,11 @@ namespace BankDepositsApplication
             }
 
             cmbxCurrency.ForeColor = Color.Black;
+        }
+
+        private void cmbxCurrency_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            UpdateCurrencyInfo();
         }
 
         private void tbxTerm_Leave(object sender, EventArgs e)
