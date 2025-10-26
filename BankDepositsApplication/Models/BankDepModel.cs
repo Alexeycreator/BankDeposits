@@ -16,5 +16,6 @@ namespace BankDepositsApplication.Models
         public bool Capitalization { get; set; }
         public string CsvCurrency { get; set; }
         public string ColorRows { get; set; }
+        public string TypeTerm { get; set; }
     }
 }

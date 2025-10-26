@@ -17,7 +17,6 @@ namespace BankDepositsApplication
         private Logger loggerAddDepositForm = LogManager.GetCurrentClassLogger();
         private List<CurrencyModel> currencys;
         private List<BankDepModel> bankDeposits;
-        private GeneralsMethods genMethods = new GeneralsMethods();
 
         private string[] banks =
         {
@@ -85,7 +84,6 @@ namespace BankDepositsApplication
 
             rBtnMonth.Enabled = true;
             rBtnMonth.Checked = true;
-            rBtnDays.Enabled = false;
 
             tbxTerm.Text = "срок";
             tbxTerm.ForeColor = Color.Gray;
@@ -154,27 +152,27 @@ namespace BankDepositsApplication
                             Term = Convert.ToInt32(tbxTerm.Text),
                             Bid = Convert.ToDouble(tbxBid.Text),
                             DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
-                            Capitalization = true
+                            Capitalization = true,
+                            TypeTerm = CheckTypeTerm()
                         });
                     }
                     else
                     {
-                        foreach (var currency in currencys)
+                        foreach (var currency in currencys.Where(currency =>
+                                     cmbxCurrency.SelectedItem.ToString() == currency.Currency))
                         {
-                            if (cmbxCurrency.SelectedItem.ToString() == currency.Currency)
+                            bankDeposits.Add(new BankDepModel
                             {
-                                bankDeposits.Add(new BankDepModel
-                                {
-                                    Name = cmbxBank.SelectedItem.ToString(),
-                                    Deposit = Convert.ToDouble(tbxDeposit.Text),
-                                    Currency = tbxCurrency.Text,
-                                    Rate = currency.Rate,
-                                    Term = Convert.ToInt32(tbxTerm.Text),
-                                    Bid = Convert.ToDouble(tbxBid.Text),
-                                    DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
-                                    Capitalization = true
-                                });
-                            }
+                                Name = cmbxBank.SelectedItem.ToString(),
+                                Deposit = Convert.ToDouble(tbxDeposit.Text),
+                                Currency = tbxCurrency.Text,
+                                Rate = currency.Rate,
+                                Term = Convert.ToInt32(tbxTerm.Text),
+                                Bid = Convert.ToDouble(tbxBid.Text),
+                                DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
+                                Capitalization = true,
+                                TypeTerm = CheckTypeTerm()
+                            });
                         }
                     }
                 }
@@ -191,27 +189,27 @@ namespace BankDepositsApplication
                             Term = Convert.ToInt32(tbxTerm.Text),
                             Bid = Convert.ToDouble(tbxBid.Text),
                             DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
-                            Capitalization = false
+                            Capitalization = false,
+                            TypeTerm = CheckTypeTerm()
                         });
                     }
                     else
                     {
-                        foreach (var currency in currencys)
+                        foreach (var currency in currencys.Where(currency =>
+                                     cmbxCurrency.SelectedItem.ToString() == currency.Currency))
                         {
-                            if (cmbxCurrency.SelectedItem.ToString() == currency.Currency)
+                            bankDeposits.Add(new BankDepModel
                             {
-                                bankDeposits.Add(new BankDepModel
-                                {
-                                    Name = cmbxBank.SelectedItem.ToString(),
-                                    Deposit = Convert.ToDouble(tbxDeposit.Text),
-                                    Currency = tbxCurrency.Text,
-                                    Rate = currency.Rate,
-                                    Term = Convert.ToInt32(tbxTerm.Text),
-                                    Bid = Convert.ToDouble(tbxBid.Text),
-                                    DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
-                                    Capitalization = false
-                                });
-                            }
+                                Name = cmbxBank.SelectedItem.ToString(),
+                                Deposit = Convert.ToDouble(tbxDeposit.Text),
+                                Currency = tbxCurrency.Text,
+                                Rate = currency.Rate,
+                                Term = Convert.ToInt32(tbxTerm.Text),
+                                Bid = Convert.ToDouble(tbxBid.Text),
+                                DateOpen = Convert.ToDateTime(dtpDateOpen.Value.ToShortDateString()),
+                                Capitalization = false,
+                                TypeTerm = CheckTypeTerm()
+                            });
                         }
                     }
                 }
@@ -222,6 +220,11 @@ namespace BankDepositsApplication
             }
 
             return bankDeposits;
+        }
+
+        private string CheckTypeTerm()
+        {
+            return rBtnDays.Checked ? "d" : "m";
         }
 
         #endregion
@@ -273,7 +276,7 @@ namespace BankDepositsApplication
                 tbxDeposit.ForeColor = Color.Gray;
             }
 
-            if (tbxDeposit.Text != null && genMethods.IsParseInt(tbxDeposit.Text))
+            if (tbxDeposit.Text != null && GeneralsMethods.IsParseInt(tbxDeposit.Text))
             {
                 btnAddDeposit.Enabled = true;
                 labelMandatoryDeposit.Visible = false;
@@ -287,7 +290,7 @@ namespace BankDepositsApplication
 
         private void tbxDeposit_Enter(object sender, EventArgs e)
         {
-            if (!genMethods.IsParseInt(tbxDeposit.Text))
+            if (!GeneralsMethods.IsParseInt(tbxDeposit.Text))
             {
                 tbxDeposit.Text = null;
             }
@@ -342,7 +345,7 @@ namespace BankDepositsApplication
                 tbxTerm.ForeColor = Color.Gray;
             }
 
-            if (tbxTerm != null && genMethods.IsParseInt(tbxTerm.Text))
+            if (tbxTerm != null && GeneralsMethods.IsParseInt(tbxTerm.Text))
             {
                 btnAddDeposit.Enabled = true;
                 labelMandatoryTerm.Visible = false;
@@ -356,7 +359,7 @@ namespace BankDepositsApplication
 
         private void tbxTerm_Enter(object sender, EventArgs e)
         {
-            if (!genMethods.IsParseInt(tbxTerm.Text))
+            if (!GeneralsMethods.IsParseInt(tbxTerm.Text))
             {
                 tbxTerm.Text = null;
             }
@@ -372,7 +375,7 @@ namespace BankDepositsApplication
                 tbxBid.ForeColor = Color.Gray;
             }
 
-            if (tbxTerm != null && genMethods.IsParseInt(tbxTerm.Text))
+            if (tbxTerm != null && GeneralsMethods.IsParseInt(tbxTerm.Text))
             {
                 btnAddDeposit.Enabled = true;
                 labelMandatoryBid.Visible = false;
@@ -386,7 +389,7 @@ namespace BankDepositsApplication
 
         private void tbxBid_Enter(object sender, EventArgs e)
         {
-            if (!genMethods.IsParseDouble(tbxBid.Text))
+            if (!GeneralsMethods.IsParseDouble(tbxBid.Text))
             {
                 tbxBid.Text = null;
             }

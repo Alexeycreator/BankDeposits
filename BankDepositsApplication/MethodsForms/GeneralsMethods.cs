@@ -6,32 +6,27 @@ namespace BankDepositsApplication.MethodsForms
 {
     public sealed class GeneralsMethods
     {
-        public string RemovedCharacters(string value)
+        public static string AllRemovedCharacters(string value)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return Regex.Replace(value, @"[^\d.]", "");
+            return string.IsNullOrEmpty(value) ? string.Empty : Regex.Replace(value, @"[^\d.]", "");
         }
 
-        public string RemovedNumbers(string value)
+        public static string ParcentRemovedCharacters(string value)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return Regex.Replace(value, @"[^a-zA-Zа-яА-Я]", "");
+            return string.IsNullOrEmpty(value) ? string.Empty : Regex.Replace(value, @"[ %]", "");
         }
 
-        public bool IsParseInt(string text)
+        public static string AllRemovedNumbers(string value)
+        {
+            return string.IsNullOrEmpty(value) ? string.Empty : Regex.Replace(value, @"[^a-zA-Zа-яА-Я]", "");
+        }
+
+        public static bool IsParseInt(string text)
         {
             return Int32.TryParse(text, out int value);
         }
 
-        public bool IsParseDouble(string text)
+        public static bool IsParseDouble(string text)
         {
             return Double.TryParse(text, out double value);
         }
@@ -41,7 +36,8 @@ namespace BankDepositsApplication.MethodsForms
             return value.ToString("N0", CultureInfo.InvariantCulture);
         }
 
-        public double CalculationTotalDeposit(double dep, double rate, double bid, int term, bool checkCapitalization)
+        public static double CalculationTotalDeposit(double dep, double rate, double bid, int term,
+            bool checkCapitalization)
         {
             if (checkCapitalization)
             {

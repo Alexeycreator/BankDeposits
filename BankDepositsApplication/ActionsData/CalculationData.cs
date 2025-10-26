@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using BankDepositsApplication.MethodsForms;
 using BankDepositsApplication.Models;
 using NLog;
@@ -10,7 +11,6 @@ namespace BankDepositsApplication.ActionsData
     {
         private Logger loggerCalculationData = LogManager.GetCurrentClassLogger();
         private List<BankDepModel> bankDeposits;
-        private GeneralsMethods genMethods = new GeneralsMethods();
 
         public CalculationData(List<BankDepModel> _bankDeposits)
         {
@@ -23,9 +23,21 @@ namespace BankDepositsApplication.ActionsData
             {
                 foreach (var dep in bankDeposits)
                 {
-                    dep.TotalDeposit = genMethods.CalculationTotalDeposit(dep.Deposit, dep.Rate, dep.Bid, dep.Term,
-                        dep.Capitalization);
-                    dep.DateClose = dep.DateOpen.AddMonths(dep.Term);
+                    switch (dep.TypeTerm)
+                    {
+                        case "m":
+                            dep.TotalDeposit = GeneralsMethods.CalculationTotalDeposit(dep.Deposit, dep.Rate, dep.Bid,
+                                dep.Term,
+                                dep.Capitalization);
+                            dep.DateClose = dep.DateOpen.AddMonths(dep.Term);
+                            break;
+                        case "d":
+                            dep.TotalDeposit = GeneralsMethods.CalculationTotalDeposit(dep.Deposit, dep.Rate, dep.Bid,
+                                dep.Term,
+                                dep.Capitalization);
+                            dep.DateClose = dep.DateOpen.AddDays(dep.Term);
+                            break;
+                    }
                 }
             }
             catch (Exception ex)

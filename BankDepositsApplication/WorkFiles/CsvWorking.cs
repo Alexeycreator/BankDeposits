@@ -13,11 +13,10 @@ namespace BankDepositsApplication.ActionsData
     internal sealed class CsvWorking
     {
         private Logger loggerCsvWorking = LogManager.GetCurrentClassLogger();
-        private GeneralsMethods genMethods = new GeneralsMethods();
 
-        internal void Writer(string csvFilePath, List<CurrencyModel> currencys)
+        public void Writer(string csvFilePath, List<CurrencyModel> currencys)
         {
-            DeleteFileCB();
+            DeleteFileCb();
             StringBuilder csvBuilder = new StringBuilder();
             csvBuilder.AppendLine("DigitalCode;LetterCode;Units;Currency;Rate");
             foreach (var currency in currencys)
@@ -29,7 +28,7 @@ namespace BankDepositsApplication.ActionsData
             File.WriteAllText(csvFilePath, csvBuilder.ToString());
         }
 
-        internal void Writer(string csvFilePath, DataGridView dataDeposits)
+        public void Writer(string csvFilePath, DataGridView dataDeposits)
         {
             StringBuilder csvBuilder = new StringBuilder();
             csvBuilder.AppendLine("Name;Deposit;Term;Bid;TotalDeposit;DateOpen;DateClose");
@@ -53,7 +52,7 @@ namespace BankDepositsApplication.ActionsData
             File.WriteAllText(csvFilePath, csvBuilder.ToString());
         }
 
-        internal List<BankDepModel> Reader(string csvFilePath, List<BankDepModel> bankDeposits)
+        public List<BankDepModel> Reader(string csvFilePath, List<BankDepModel> bankDeposits)
         {
             if (!File.Exists(csvFilePath))
             {
@@ -87,13 +86,13 @@ namespace BankDepositsApplication.ActionsData
                     bankDeposits.Add(new BankDepModel()
                     {
                         Name = values[0].Trim(),
-                        Deposit = Convert.ToDouble(genMethods.RemovedCharacters(values[1])),
-                        Term = Convert.ToInt32(genMethods.RemovedCharacters(values[2])),
-                        Bid = Convert.ToDouble(genMethods.RemovedCharacters(values[3].Replace(".", ","))),
-                        TotalDeposit = Convert.ToDouble(genMethods.RemovedCharacters(values[4])),
+                        Deposit = Convert.ToDouble(GeneralsMethods.AllRemovedCharacters(values[1])),
+                        Term = Convert.ToInt32(GeneralsMethods.AllRemovedCharacters(values[2])),
+                        Bid = Convert.ToDouble(GeneralsMethods.ParcentRemovedCharacters(values[3].Replace(".", ","))),
+                        TotalDeposit = Convert.ToDouble(GeneralsMethods.AllRemovedCharacters(values[4])),
                         DateOpen = Convert.ToDateTime(values[5].Trim()),
                         DateClose = targetDate,
-                        CsvCurrency = genMethods.RemovedNumbers(values[1].Trim()),
+                        CsvCurrency = GeneralsMethods.AllRemovedNumbers(values[1].Trim()),
                         ColorRows = colorRows.ToString(),
                     });
                 }
@@ -102,7 +101,7 @@ namespace BankDepositsApplication.ActionsData
             return bankDeposits;
         }
 
-        private void DeleteFileCB()
+        private void DeleteFileCb()
         {
             string dirPath = Path.Combine(Directory.GetCurrentDirectory());
             string file = "Курсы*.csv";

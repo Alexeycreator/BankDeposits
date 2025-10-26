@@ -27,7 +27,7 @@ namespace BankDepositsApplication
         private List<CurrencyModel> currencys = new List<CurrencyModel>();
         private List<BankDepModel> bankDeposits = new List<BankDepModel>();
         private CsvWorking csvWorking = new CsvWorking();
-        private GeneralsMethods genMethods = new GeneralsMethods();
+        private GeneralsMethods GeneralsMethods = new GeneralsMethods();
         public event Action<List<CurrencyModel>> CurrencyDataReady;
         private int retryCount = 0;
         private const int maxRetryes = 3;
@@ -132,10 +132,10 @@ namespace BankDepositsApplication
                     foreach (var bankDep in bankDeposits)
                     {
                         var cellName = bankDep.Name;
-                        var cellDeposit = $"{genMethods.FormatNumberRows(bankDep.Deposit)} {bankDep.Currency}";
+                        var cellDeposit = $"{GeneralsMethods.FormatNumberRows(bankDep.Deposit)} {bankDep.Currency}";
                         var cellTerm = $"{bankDep.Term} мес";
                         var cellBid = $"{bankDep.Bid} %";
-                        var cellTotalDeposit = $"{genMethods.FormatNumberRows(bankDep.TotalDeposit)} руб";
+                        var cellTotalDeposit = $"{GeneralsMethods.FormatNumberRows(bankDep.TotalDeposit)} руб";
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
                         capitalize = bankDep.Capitalization ? true : false;
@@ -158,10 +158,10 @@ namespace BankDepositsApplication
                     foreach (var bankDep in bankDeposits)
                     {
                         var cellName = bankDep.Name;
-                        var cellDeposit = $"{genMethods.FormatNumberRows(bankDep.Deposit)} {bankDep.CsvCurrency}";
+                        var cellDeposit = $"{GeneralsMethods.FormatNumberRows(bankDep.Deposit)} {bankDep.CsvCurrency}";
                         var cellTerm = $"{bankDep.Term} мес";
                         var cellBid = $"{bankDep.Bid} %";
-                        var cellTotalDeposit = $"{genMethods.FormatNumberRows(bankDep.TotalDeposit)} руб";
+                        var cellTotalDeposit = $"{GeneralsMethods.FormatNumberRows(bankDep.TotalDeposit)} руб";
                         var cellDateOpen = bankDep.DateOpen.ToShortDateString();
                         var cellDateClose = bankDep.DateClose.ToShortDateString();
                         capitalize = bankDep.Capitalization ? true : false;
@@ -180,7 +180,7 @@ namespace BankDepositsApplication
                                 colorDep = (int)VariableColor.Y;
                                 break;
                             case "G":
-                                dgvPrintInfo.Rows[rowIndexAdded].DefaultCellStyle.BackColor = Color.Green;
+                                dgvPrintInfo.Rows[rowIndexAdded].DefaultCellStyle.BackColor = Color.White;
                                 colorDep = (int)VariableColor.G;
                                 break;
                             default:
@@ -241,7 +241,7 @@ namespace BankDepositsApplication
         {
             if (tDate >= dToday.AddDays(3))
             {
-                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.Green;
+                dgvPrintInfo.Rows[rIndex].DefaultCellStyle.BackColor = Color.White;
             }
             else if (tDate < dToday)
             {
@@ -259,10 +259,10 @@ namespace BankDepositsApplication
             {
                 dgvPrintInfo.Rows[rowIndex].Cells["Name"].Value = updatedData.BankName;
                 dgvPrintInfo.Rows[rowIndex].Cells["Deposit"].Value =
-                    $"{genMethods.FormatNumberRows(updatedData.Deposit)} {updatedData.Currency}";
+                    $"{GeneralsMethods.FormatNumberRows(updatedData.Deposit)} {updatedData.Currency}";
                 dgvPrintInfo.Rows[rowIndex].Cells["Term"].Value = $"{updatedData.Term} мес";
                 dgvPrintInfo.Rows[rowIndex].Cells["Bid"].Value = $"{updatedData.Bid} %";
-                string calcTotalDep = genMethods.FormatNumberRows(genMethods.CalculationTotalDeposit(
+                string calcTotalDep = GeneralsMethods.FormatNumberRows(GeneralsMethods.CalculationTotalDeposit(
                     updatedData.Deposit,
                     updatedData.Rate, updatedData.Bid, updatedData.Term, updatedData.Capitalization));
                 dgvPrintInfo.Rows[rowIndex].Cells["TotalDeposit"].Value =
@@ -414,29 +414,31 @@ namespace BankDepositsApplication
             {
                 bankName = dgvPrintInfo.Rows[e.RowIndex].Cells["Name"].Value.ToString();
                 deposit = Convert.ToDouble(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["TotalDeposit"].Value
+                    GeneralsMethods.AllRemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["TotalDeposit"].Value
                         .ToString()));
                 term = Convert.ToInt32(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["Term"].Value.ToString()));
+                    GeneralsMethods.AllRemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["Term"].Value
+                        .ToString()));
                 bid = Convert.ToDouble(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["Bid"].Value
+                    GeneralsMethods.AllRemovedCharacters(dgvPrintInfo.Rows[currentRowIndex].Cells["Bid"].Value
                         .ToString())); // это можно поменять на реальный процент
                 dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[currentRowIndex].Cells["DateClose"].Value.ToString());
-                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[currentRowIndex].Cells["TotalDeposit"].Value
+                currency = GeneralsMethods.AllRemovedNumbers(dgvPrintInfo.Rows[currentRowIndex].Cells["TotalDeposit"]
+                    .Value
                     .ToString());
-                
             }
             else
             {
                 bankName = dgvPrintInfo.Rows[e.RowIndex].Cells["Name"].Value.ToString();
                 deposit = Convert.ToDouble(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Deposit"].Value.ToString()));
+                    GeneralsMethods.AllRemovedCharacters(
+                        dgvPrintInfo.Rows[e.RowIndex].Cells["Deposit"].Value.ToString()));
                 term = Convert.ToInt32(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Term"].Value.ToString()));
+                    GeneralsMethods.AllRemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Term"].Value.ToString()));
                 bid = Convert.ToDouble(
-                    genMethods.RemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value.ToString()));
+                    GeneralsMethods.AllRemovedCharacters(dgvPrintInfo.Rows[e.RowIndex].Cells["Bid"].Value.ToString()));
                 dateOpen = Convert.ToDateTime(dgvPrintInfo.Rows[e.RowIndex].Cells["DateOpen"].Value.ToString());
-                currency = genMethods.RemovedNumbers(dgvPrintInfo.Rows[e.RowIndex].Cells["Deposit"].Value
+                currency = GeneralsMethods.AllRemovedNumbers(dgvPrintInfo.Rows[e.RowIndex].Cells["Deposit"].Value
                     .ToString());
             }
 

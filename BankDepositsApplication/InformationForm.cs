@@ -123,7 +123,7 @@ namespace BankDepositsApplication
 
         private void tbxDeposit_Enter(object sender, EventArgs e)
         {
-            if (!genMethods.IsParseInt(tbxDeposit.Text))
+            if (!GeneralsMethods.IsParseInt(tbxDeposit.Text))
             {
                 tbxDeposit.Text = null;
             }
@@ -139,7 +139,7 @@ namespace BankDepositsApplication
                 tbxDeposit.ForeColor = Color.Gray;
             }
 
-            if (tbxDeposit.Text != null && genMethods.IsParseInt(tbxDeposit.Text))
+            if (tbxDeposit.Text != null && GeneralsMethods.IsParseInt(tbxDeposit.Text))
             {
                 btnChangeDeposit.Enabled = true;
                 labelMandatoryDeposit.Visible = false;
@@ -179,7 +179,7 @@ namespace BankDepositsApplication
 
         private void tbxTerm_Enter(object sender, EventArgs e)
         {
-            if (!genMethods.IsParseInt(tbxTerm.Text))
+            if (!GeneralsMethods.IsParseInt(tbxTerm.Text))
             {
                 tbxTerm.Text = null;
             }
@@ -195,7 +195,7 @@ namespace BankDepositsApplication
                 tbxTerm.ForeColor = Color.Gray;
             }
 
-            if (tbxTerm != null && genMethods.IsParseInt(tbxTerm.Text))
+            if (tbxTerm != null && GeneralsMethods.IsParseInt(tbxTerm.Text))
             {
                 btnChangeDeposit.Enabled = true;
                 labelMandatoryTerm.Visible = false;
@@ -209,7 +209,7 @@ namespace BankDepositsApplication
 
         private void tbxBid_Enter(object sender, EventArgs e)
         {
-            if (!genMethods.IsParseDouble(tbxBid.Text))
+            if (!GeneralsMethods.IsParseDouble(tbxBid.Text))
             {
                 tbxBid.Text = null;
             }
@@ -225,7 +225,7 @@ namespace BankDepositsApplication
                 tbxBid.ForeColor = Color.Gray;
             }
 
-            if (tbxTerm != null && genMethods.IsParseInt(tbxTerm.Text))
+            if (tbxTerm != null && GeneralsMethods.IsParseInt(tbxTerm.Text))
             {
                 btnChangeDeposit.Enabled = true;
                 labelMandatoryBid.Visible = false;
@@ -294,7 +294,7 @@ namespace BankDepositsApplication
             bool updatedCapitalization = chbxCapitalization.Checked;
             if (updatedDateClose >= DateTime.Today.AddDays(3))
             {
-                updatedColorRow = Color.Green;
+                updatedColorRow = Color.White;
             }
             else if (updatedDateClose < DateTime.Today)
             {
